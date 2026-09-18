@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Plan It
 
-## Getting Started
+Planning tools for the part of a project that happens before the first commit.
 
-First, run the development server:
+Most planning apps are built around executing work. Plan It is built around
+shaping it — the backlog you rewrite three times, the ideas that are not tasks
+yet, the structure you want settled before you start typing. Kanban is the first
+planner; Mindmap and Roadmap are next.
+
+## Features
+
+**Kanban**
+
+- Multiple boards, each with its own columns, cards and labels
+- Columns you define: rename, reorder, delete, optional WIP limits
+- Cards with description, colored labels, priority and due dates
+- Drag and drop for cards and columns, with menu-based moves for keyboard and touch
+- Search and filter by text, label or priority
+- Export a board to JSON and import it back
+
+Everything is stored locally in your browser, so there is no account and no
+server. Boards travel as JSON files.
+
+## Getting started
+
+Requires [Bun](https://bun.com).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
+bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+bun run build   # production build
+bun run lint    # eslint
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech
 
-## Learn More
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · zustand ·
+pragmatic-drag-and-drop
 
-To learn more about Next.js, take a look at the following resources:
+## Project structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+  app/                 routes
+  components/ui/       generic primitives
+  components/app/      app shell
+  components/kanban/   the Kanban planner
+  store/               zustand stores, one per planner
+  helpers/             utilities and the persistence adapter
+  types/               shared types
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Persistence lives behind a single adapter in `src/helpers/storage.ts`, so moving
+boards to a backend later does not touch the UI. See
+[docs/architecture.md](docs/architecture.md) for the full picture.
 
-## Deploy on Vercel
+## Roadmap
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [x] Kanban boards
+- [ ] Mindmaps
+- [ ] Roadmap / timeline view
+- [ ] Sync across devices
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+[MIT](LICENSE)
