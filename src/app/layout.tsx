@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { AppOverlays } from "@/components/app/AppOverlays";
 import { TopBar } from "@/components/app/TopBar";
+import { SITE } from "@/helpers/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,8 +16,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Plan It",
-  description: "Plan your next project before you build it.",
+  title: {
+    default: `${SITE.name} — plan before you build`,
+    template: `%s · ${SITE.name}`,
+  },
+  description: SITE.description,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -24,9 +29,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="bg-canvas flex h-dvh flex-col overflow-hidden font-sans text-zinc-100">
+      <body className="flex min-h-full flex-col bg-canvas font-sans text-zinc-100">
         <TopBar />
-        <main className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</main>
+        <main className="flex min-h-0 flex-1 flex-col">{children}</main>
+        <AppOverlays />
       </body>
     </html>
   );

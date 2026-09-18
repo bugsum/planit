@@ -9,8 +9,10 @@ import { attachClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/clos
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge/extract-closest-edge";
 import type { Edge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/types";
 import { useEffect, useRef, useState } from "react";
+import { cardMenu } from "@/components/kanban/menus";
 import { Badge } from "@/components/ui/Badge";
-import { Menu, MenuItem, MenuLabel, MenuSeparator } from "@/components/ui/Menu";
+import { MenuButton, openContextMenu } from "@/components/ui/ContextMenu";
+import { CalendarIcon } from "@/components/ui/Icons";
 import {
   LABEL_CLASSES,
   PRIORITY_CLASSES,
@@ -20,16 +22,22 @@ import {
 } from "@/helpers/board";
 import { cn } from "@/helpers/cn";
 import { cardDragData, isCardData } from "@/helpers/dnd";
-import { useBoardActions } from "@/store/boards";
-import type { Card, Column, Label } from "@/types/kanban";
+import { getBoard } from "@/store/boards";
+import type { Card, Label } from "@/types/kanban";
 
 type Props = {
   boardId: string;
   columnId: string;
   card: Card;
   labels: Label[];
-  columns: Column[];
+  selected: boolean;
+  onSelect: (cardId: string) => void;
   onOpen: () => void;
+};
+
+const PRIORITY_STRIPE: Partial<Record<Card["priority"], string>> = {
+  high: "bg-orange-400",
+  urgent: "bg-red-400",
 };
 
 export function CardItem({
@@ -37,13 +45,13 @@ export function CardItem({
   columnId,
   card,
   labels,
-  columns,
+  selected,
+  onSelect,
   onOpen,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
   const [edge, setEdge] = useState<Edge | null>(null);
-  const actions = useBoardActions();
 
   useEffect(() => {
     const element = ref.current;
@@ -71,105 +79,58 @@ export function CardItem({
     );
   }, [card.id, columnId]);
 
-  // Positions come from the stored column, not the rendered list, so the move
-  // actions stay correct while a filter hides some cards.
-  const column = columns.find((item) => item.id === columnId);
-  const index = column ? column.cardIds.indexOf(card.id) : 0;
-  const count = column ? column.cardIds.length : 0;
+  const entries = () => {
+    const board = getBoard(boardId);
+    return board ? cardMenu(board, card.id, { onOpen, onSelect }) : [];
+  };
 
   const cardLabels = card.labelIds
     .map((id) => labels.find((label) => label.id === id))
     .filter((label): label is Label => Boolean(label));
   const overdue = isOverdue(card.dueDate);
+  const stripe = PRIORITY_STRIPE[card.priority];
 
   return (
-    <div className="relative">
-      {edge === "top" ? <DropLine position="-top-1" /> : null}
+    <div className="relative" data-card-id={card.id}>
+      {edge === "top" ? <DropLine position="-top-[5px]" /> : null}
       <div
         ref={ref}
+        onClick={onOpen}
+        onContextMenu={(event) => {
+          onSelect(card.id);
+          openContextMenu(event, entries());
+        }}
+        aria-selected={selected}
         className={cn(
-          "group rounded-md border border-zinc-800 bg-zinc-900 p-3 transition-colors hover:border-zinc-700",
+          "group relative cursor-pointer overflow-hidden rounded-lg border bg-raised px-3 py-2.5 shadow-sm shadow-black/30 transition-[border-color,box-shadow,opacity]",
+          selected
+            ? "border-accent ring-3 ring-accent/25"
+            : "border-line hover:border-line-strong",
           dragging && "opacity-40",
         )}
       >
+        {stripe ? <span className={cn("absolute inset-y-0 left-0 w-[3px]", stripe)} /> : null}
+
         <div className="flex items-start justify-between gap-2">
           <button
             type="button"
-            onClick={onOpen}
-            className="flex-1 cursor-pointer text-left text-sm leading-snug text-zinc-100"
+            onClick={(event) => {
+              event.stopPropagation();
+              onOpen();
+            }}
+            className="min-w-0 flex-1 cursor-pointer text-left text-[13.5px] leading-snug font-semibold break-words text-zinc-100"
           >
             {card.title}
           </button>
-          <Menu label={`Card options for ${card.title}`}>
-            {(close) => (
-              <>
-                <MenuItem
-                  onClick={() => {
-                    onOpen();
-                    close();
-                  }}
-                >
-                  Open
-                </MenuItem>
-                <MenuItem
-                  disabled={index === 0}
-                  onClick={() => {
-                    actions.moveCard(boardId, card.id, columnId, index - 1);
-                    close();
-                  }}
-                >
-                  Move up
-                </MenuItem>
-                <MenuItem
-                  disabled={index === count - 1}
-                  onClick={() => {
-                    actions.moveCard(boardId, card.id, columnId, index + 1);
-                    close();
-                  }}
-                >
-                  Move down
-                </MenuItem>
-                {columns.length > 1 ? (
-                  <>
-                    <MenuSeparator />
-                    <MenuLabel>Move to</MenuLabel>
-                    {columns
-                      .filter((column) => column.id !== columnId)
-                      .map((column) => (
-                        <MenuItem
-                          key={column.id}
-                          onClick={() => {
-                            actions.moveCard(
-                              boardId,
-                              card.id,
-                              column.id,
-                              column.cardIds.length,
-                            );
-                            close();
-                          }}
-                        >
-                          {column.title}
-                        </MenuItem>
-                      ))}
-                  </>
-                ) : null}
-                <MenuSeparator />
-                <MenuItem
-                  danger
-                  onClick={() => {
-                    actions.deleteCard(boardId, card.id);
-                    close();
-                  }}
-                >
-                  Delete
-                </MenuItem>
-              </>
-            )}
-          </Menu>
+          <MenuButton
+            label={`Actions for ${card.title}`}
+            entries={entries}
+            className="-mt-1 -mr-1.5 h-7 w-7 group-hover:opacity-100 focus-visible:opacity-100 aria-expanded:opacity-100 [@media(hover:hover)]:opacity-0"
+          />
         </div>
 
         {cardLabels.length > 0 || card.priority !== "none" || card.dueDate ? (
-          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
             {card.priority !== "none" ? (
               <Badge className={PRIORITY_CLASSES[card.priority]}>
                 {PRIORITY_LABELS[card.priority]}
@@ -182,25 +143,27 @@ export function CardItem({
             ))}
             {card.dueDate ? (
               <Badge
-                className={
-                  overdue
-                    ? "border-amber-500/30 bg-amber-500/15 text-amber-300"
-                    : "border-zinc-700 bg-zinc-800 text-zinc-400"
-                }
+                className={cn(
+                  "border-line-strong bg-white/[0.03] text-zinc-400",
+                  overdue && "border-amber-500/30 bg-amber-500/15 text-amber-300",
+                )}
               >
+                <CalendarIcon width={11} height={11} />
                 {formatDate(card.dueDate)}
               </Badge>
             ) : null}
           </div>
         ) : null}
       </div>
-      {edge === "bottom" ? <DropLine position="-bottom-1" /> : null}
+      {edge === "bottom" ? <DropLine position="-bottom-[5px]" /> : null}
     </div>
   );
 }
 
 function DropLine({ position }: { position: string }) {
   return (
-    <div className={cn("absolute inset-x-0 z-10 h-0.5 rounded bg-indigo-500", position)} />
+    <div
+      className={cn("absolute inset-x-1 z-10 h-0.5 rounded-full bg-accent", position)}
+    />
   );
 }
