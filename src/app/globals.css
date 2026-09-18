@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-canvas: #09090b;
+  --color-surface: #131316;
+  --color-surface-raised: #1b1b1f;
+  --color-line: #27272a;
+  --color-accent: #6366f1;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-zinc-100);
+}
+
+/* Slim scrollbars keep the horizontal board from eating vertical space. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-zinc-700) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-zinc-700);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
