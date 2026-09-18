@@ -14,9 +14,14 @@ planner; Mindmap and Roadmap are next.
 - Multiple boards, each with its own columns, cards and labels
 - Columns you define: rename, reorder, delete, optional WIP limits
 - Cards with description, colored labels, priority and due dates
-- Drag and drop for cards and columns, with menu-based moves for keyboard and touch
+- Drag and drop for cards and columns
+- Keyboard-first: select, move, duplicate, delete and re-prioritise cards without the mouse
+- Right-click context menus on cards, columns, boards and empty space
+- Undo and redo for every board edit
 - Search and filter by text, label or priority
 - Export a board to JSON and import it back
+
+Press <kbd>?</kbd> anywhere in the app for the full list of shortcuts.
 
 Everything is stored locally in your browser, so there is no account and no
 server. Boards travel as JSON files.
@@ -47,11 +52,12 @@ pragmatic-drag-and-drop
 ```
 src/
   app/                 routes
-  components/ui/       generic primitives
-  components/app/      app shell
+  components/ui/       generic primitives (buttons, dialogs, context menu)
+  components/app/      app shell and shortcut guide
+  components/home/     homepage sections
   components/kanban/   the Kanban planner
-  store/               zustand stores, one per planner
-  helpers/             utilities and the persistence adapter
+  store/               zustand stores, one per planner, plus UI state
+  helpers/             utilities, keybindings and the persistence adapter
   types/               shared types
 ```
 

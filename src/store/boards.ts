@@ -14,21 +14,33 @@ import { newId } from "@/helpers/id";
 import { planitStorage } from "@/helpers/storage";
 import type { Board, Card, Label, LabelColor } from "@/types/kanban";
 
+const HISTORY_LIMIT = 100;
+const COALESCE_MS = 1000;
+
+type History = {
+  past: Board[];
+  future: Board[];
+  lastKey: string | null;
+  lastAt: number;
+};
+
 type BoardsState = {
   boards: Record<string, Board>;
   boardOrder: string[];
+  history: Record<string, History>;
   createBoard: (name: string) => string;
   renameBoard: (boardId: string, name: string) => void;
   deleteBoard: (boardId: string) => void;
   duplicateBoard: (boardId: string) => string | null;
   importBoard: (board: Board) => string;
-  addColumn: (boardId: string, title: string) => void;
+  addColumn: (boardId: string, title: string) => string;
   renameColumn: (boardId: string, columnId: string, title: string) => void;
   deleteColumn: (boardId: string, columnId: string) => void;
   moveColumn: (boardId: string, columnId: string, toIndex: number) => void;
   setWipLimit: (boardId: string, columnId: string, limit: number | null) => void;
-  addCard: (boardId: string, columnId: string, title: string) => void;
+  addCard: (boardId: string, columnId: string, title: string) => string;
   updateCard: (boardId: string, cardId: string, patch: Partial<Card>) => void;
+  duplicateCard: (boardId: string, cardId: string) => string | null;
   deleteCard: (boardId: string, cardId: string) => void;
   moveCard: (
     boardId: string,
@@ -39,180 +51,242 @@ type BoardsState = {
   addLabel: (boardId: string, name: string, color: LabelColor) => void;
   updateLabel: (boardId: string, labelId: string, patch: Partial<Label>) => void;
   deleteLabel: (boardId: string, labelId: string) => void;
+  undo: (boardId: string) => void;
+  redo: (boardId: string) => void;
 };
 
-function touch(board: Board | undefined) {
-  if (board) board.updatedAt = new Date().toISOString();
-}
+/** Return `false` to signal "nothing changed": no history entry, no timestamp bump. */
+type Recipe = (board: Board) => void | false;
 
 export const useBoardsStore = create<BoardsState>()(
   persist(
-    immer<BoardsState>((set, get) => ({
-      boards: {},
-      boardOrder: [],
+    immer<BoardsState>((set, get) => {
+      /**
+       * Every board edit goes through here so it lands in undo history. Edits
+       * sharing a `key` within a second (typing into a card field) collapse
+       * into one undo step instead of one per keystroke.
+       */
+      const edit = (boardId: string, recipe: Recipe, key?: string) => {
+        const before = get().boards[boardId];
+        if (!before) return;
 
-      createBoard: (name) => {
-        const board = buildBoard(name.trim() || "Untitled board");
+        set((state) => {
+          const board = state.boards[boardId];
+          if (recipe(board) === false) return;
+          board.updatedAt = new Date().toISOString();
+
+          const history = (state.history[boardId] ??= {
+            past: [],
+            future: [],
+            lastKey: null,
+            lastAt: 0,
+          });
+          const now = Date.now();
+          const coalesce =
+            key !== undefined && key === history.lastKey && now - history.lastAt < COALESCE_MS;
+          if (!coalesce) {
+            history.past.push(before);
+            if (history.past.length > HISTORY_LIMIT) history.past.shift();
+          }
+          history.future = [];
+          history.lastKey = key ?? null;
+          history.lastAt = now;
+        });
+      };
+
+      const addBoard = (board: Board) => {
         set((state) => {
           state.boards[board.id] = board;
           state.boardOrder.unshift(board.id);
         });
         return board.id;
-      },
+      };
 
-      renameBoard: (boardId, name) =>
-        set((state) => {
-          const board = state.boards[boardId];
-          if (!board) return;
-          board.name = name.trim() || board.name;
-          touch(board);
-        }),
+      return {
+        boards: {},
+        boardOrder: [],
+        history: {},
 
-      deleteBoard: (boardId) =>
-        set((state) => {
-          delete state.boards[boardId];
-          state.boardOrder = state.boardOrder.filter((id) => id !== boardId);
-        }),
+        createBoard: (name) => addBoard(buildBoard(name.trim() || "Untitled board")),
 
-      duplicateBoard: (boardId) => {
-        const source = get().boards[boardId];
-        if (!source) return null;
-        const copy = cloneBoard(source, `${source.name} (copy)`);
-        set((state) => {
-          state.boards[copy.id] = copy;
-          state.boardOrder.unshift(copy.id);
-        });
-        return copy.id;
-      },
+        renameBoard: (boardId, name) =>
+          edit(boardId, (board) => {
+            const next = name.trim();
+            if (!next || next === board.name) return false;
+            board.name = next;
+          }),
 
-      importBoard: (board) => {
-        const copy = cloneBoard(board, board.name);
-        set((state) => {
-          state.boards[copy.id] = copy;
-          state.boardOrder.unshift(copy.id);
-        });
-        return copy.id;
-      },
+        deleteBoard: (boardId) =>
+          set((state) => {
+            delete state.boards[boardId];
+            delete state.history[boardId];
+            state.boardOrder = state.boardOrder.filter((id) => id !== boardId);
+          }),
 
-      addColumn: (boardId, title) =>
-        set((state) => {
-          const board = state.boards[boardId];
-          if (!board) return;
-          board.columns.push(createColumn(title.trim() || "New column"));
-          touch(board);
-        }),
+        duplicateBoard: (boardId) => {
+          const source = get().boards[boardId];
+          return source ? addBoard(cloneBoard(source, `${source.name} (copy)`)) : null;
+        },
 
-      renameColumn: (boardId, columnId, title) =>
-        set((state) => {
-          const board = state.boards[boardId];
-          const column = board?.columns.find((c) => c.id === columnId);
-          if (!column) return;
-          column.title = title.trim() || column.title;
-          touch(board);
-        }),
+        importBoard: (board) => addBoard(cloneBoard(board, board.name)),
 
-      deleteColumn: (boardId, columnId) =>
-        set((state) => {
-          const board = state.boards[boardId];
-          const column = board?.columns.find((c) => c.id === columnId);
-          if (!board || !column) return;
-          for (const cardId of column.cardIds) delete board.cards[cardId];
-          board.columns = board.columns.filter((c) => c.id !== columnId);
-          touch(board);
-        }),
+        addColumn: (boardId, title) => {
+          const column = createColumn(title.trim() || "New column");
+          edit(boardId, (board) => {
+            board.columns.push(column);
+          });
+          return column.id;
+        },
 
-      moveColumn: (boardId, columnId, toIndex) =>
-        set((state) => {
-          const board = state.boards[boardId];
-          if (!board) return;
-          const from = board.columns.findIndex((c) => c.id === columnId);
-          if (from < 0 || from === toIndex) return;
-          board.columns = moveInArray(board.columns, from, toIndex);
-          touch(board);
-        }),
+        renameColumn: (boardId, columnId, title) =>
+          edit(boardId, (board) => {
+            const column = board.columns.find((c) => c.id === columnId);
+            const next = title.trim();
+            if (!column || !next || next === column.title) return false;
+            column.title = next;
+          }),
 
-      setWipLimit: (boardId, columnId, limit) =>
-        set((state) => {
-          const board = state.boards[boardId];
-          const column = board?.columns.find((c) => c.id === columnId);
-          if (!column) return;
-          column.wipLimit = limit && limit > 0 ? limit : null;
-          touch(board);
-        }),
+        deleteColumn: (boardId, columnId) =>
+          edit(boardId, (board) => {
+            const column = board.columns.find((c) => c.id === columnId);
+            if (!column) return false;
+            for (const cardId of column.cardIds) delete board.cards[cardId];
+            board.columns = board.columns.filter((c) => c.id !== columnId);
+          }),
 
-      addCard: (boardId, columnId, title) =>
-        set((state) => {
-          const board = state.boards[boardId];
-          const column = board?.columns.find((c) => c.id === columnId);
-          if (!board || !column) return;
+        moveColumn: (boardId, columnId, toIndex) =>
+          edit(boardId, (board) => {
+            const from = board.columns.findIndex((c) => c.id === columnId);
+            const to = Math.max(0, Math.min(toIndex, board.columns.length - 1));
+            if (from < 0 || from === to) return false;
+            board.columns = moveInArray(board.columns, from, to);
+          }),
+
+        setWipLimit: (boardId, columnId, limit) =>
+          edit(boardId, (board) => {
+            const column = board.columns.find((c) => c.id === columnId);
+            const next = limit && limit > 0 ? limit : null;
+            if (!column || column.wipLimit === next) return false;
+            column.wipLimit = next;
+          }),
+
+        addCard: (boardId, columnId, title) => {
           const card = createCard(title.trim());
-          board.cards[card.id] = card;
-          column.cardIds.push(card.id);
-          touch(board);
-        }),
+          edit(boardId, (board) => {
+            const column = board.columns.find((c) => c.id === columnId);
+            if (!column) return false;
+            board.cards[card.id] = card;
+            column.cardIds.push(card.id);
+          });
+          return card.id;
+        },
 
-      updateCard: (boardId, cardId, patch) =>
-        set((state) => {
-          const board = state.boards[boardId];
-          const card = board?.cards[cardId];
-          if (!board || !card) return;
-          Object.assign(card, patch, { updatedAt: new Date().toISOString() });
-          touch(board);
-        }),
+        updateCard: (boardId, cardId, patch) =>
+          edit(
+            boardId,
+            (board) => {
+              const card = board.cards[cardId];
+              if (!card) return false;
+              Object.assign(card, patch, { updatedAt: new Date().toISOString() });
+            },
+            `card:${cardId}:${Object.keys(patch).sort().join(",")}`,
+          ),
 
-      deleteCard: (boardId, cardId) =>
-        set((state) => {
-          const board = state.boards[boardId];
-          if (!board) return;
-          delete board.cards[cardId];
-          for (const column of board.columns) {
-            column.cardIds = column.cardIds.filter((id) => id !== cardId);
-          }
-          touch(board);
-        }),
+        duplicateCard: (boardId, cardId) => {
+          const source = get().boards[boardId]?.cards[cardId];
+          if (!source) return null;
+          const now = new Date().toISOString();
+          const copy: Card = {
+            ...source,
+            id: newId("card"),
+            labelIds: [...source.labelIds],
+            createdAt: now,
+            updatedAt: now,
+          };
+          edit(boardId, (board) => {
+            const column = board.columns.find((c) => c.cardIds.includes(cardId));
+            if (!column) return false;
+            board.cards[copy.id] = copy;
+            column.cardIds.splice(column.cardIds.indexOf(cardId) + 1, 0, copy.id);
+          });
+          return copy.id;
+        },
 
-      moveCard: (boardId, cardId, toColumnId, toIndex) =>
-        set((state) => {
-          const board = state.boards[boardId];
-          const target = board?.columns.find((c) => c.id === toColumnId);
-          if (!board || !target) return;
-          const source = board.columns.find((c) => c.cardIds.includes(cardId));
-          if (!source) return;
+        deleteCard: (boardId, cardId) =>
+          edit(boardId, (board) => {
+            if (!board.cards[cardId]) return false;
+            delete board.cards[cardId];
+            for (const column of board.columns) {
+              column.cardIds = column.cardIds.filter((id) => id !== cardId);
+            }
+          }),
 
-          source.cardIds.splice(source.cardIds.indexOf(cardId), 1);
-          const index = Math.max(0, Math.min(toIndex, target.cardIds.length));
-          target.cardIds.splice(index, 0, cardId);
-          touch(board);
-        }),
+        moveCard: (boardId, cardId, toColumnId, toIndex) =>
+          edit(boardId, (board) => {
+            const target = board.columns.find((c) => c.id === toColumnId);
+            const source = board.columns.find((c) => c.cardIds.includes(cardId));
+            if (!target || !source) return false;
 
-      addLabel: (boardId, name, color) =>
-        set((state) => {
-          const board = state.boards[boardId];
-          if (!board) return;
-          board.labels.push({ id: newId("label"), name: name.trim() || "Label", color });
-          touch(board);
-        }),
+            const from = source.cardIds.indexOf(cardId);
+            const sameColumn = source.id === target.id;
+            const limit = target.cardIds.length - (sameColumn ? 1 : 0);
+            const index = Math.max(0, Math.min(toIndex, limit));
+            if (sameColumn && index === from) return false;
 
-      updateLabel: (boardId, labelId, patch) =>
-        set((state) => {
-          const board = state.boards[boardId];
-          const label = board?.labels.find((l) => l.id === labelId);
-          if (!label) return;
-          Object.assign(label, patch);
-          touch(board);
-        }),
+            source.cardIds.splice(from, 1);
+            target.cardIds.splice(index, 0, cardId);
+          }),
 
-      deleteLabel: (boardId, labelId) =>
-        set((state) => {
-          const board = state.boards[boardId];
-          if (!board) return;
-          board.labels = board.labels.filter((l) => l.id !== labelId);
-          for (const card of Object.values(board.cards)) {
-            card.labelIds = card.labelIds.filter((id) => id !== labelId);
-          }
-          touch(board);
-        }),
-    })),
+        addLabel: (boardId, name, color) =>
+          edit(boardId, (board) => {
+            board.labels.push({ id: newId("label"), name: name.trim() || "Label", color });
+          }),
+
+        updateLabel: (boardId, labelId, patch) =>
+          edit(boardId, (board) => {
+            const label = board.labels.find((l) => l.id === labelId);
+            if (!label) return false;
+            Object.assign(label, patch);
+          }),
+
+        deleteLabel: (boardId, labelId) =>
+          edit(boardId, (board) => {
+            if (!board.labels.some((l) => l.id === labelId)) return false;
+            board.labels = board.labels.filter((l) => l.id !== labelId);
+            for (const card of Object.values(board.cards)) {
+              card.labelIds = card.labelIds.filter((id) => id !== labelId);
+            }
+          }),
+
+        undo: (boardId) => {
+          const current = get().boards[boardId];
+          const past = get().history[boardId]?.past;
+          const previous = past?.[past.length - 1];
+          if (!current || !previous) return;
+          set((state) => {
+            const history = state.history[boardId];
+            history.past.pop();
+            history.future.push(current);
+            history.lastKey = null;
+            state.boards[boardId] = previous;
+          });
+        },
+
+        redo: (boardId) => {
+          const current = get().boards[boardId];
+          const future = get().history[boardId]?.future;
+          const next = future?.[future.length - 1];
+          if (!current || !next) return;
+          set((state) => {
+            const history = state.history[boardId];
+            history.future.pop();
+            history.past.push(current);
+            history.lastKey = null;
+            state.boards[boardId] = next;
+          });
+        },
+      };
+    }),
     {
       name: "planit.kanban.v1",
       version: 1,
@@ -273,14 +347,13 @@ export function useBoardList() {
   );
 }
 
-export function useColumn(boardId: string, columnId: string) {
-  return useBoardsStore((state) =>
-    state.boards[boardId]?.columns.find((column) => column.id === columnId),
+export function useUndoState(boardId: string) {
+  return useBoardsStore(
+    useShallow((state) => ({
+      canUndo: (state.history[boardId]?.past.length ?? 0) > 0,
+      canRedo: (state.history[boardId]?.future.length ?? 0) > 0,
+    })),
   );
-}
-
-export function useCard(boardId: string, cardId: string) {
-  return useBoardsStore((state) => state.boards[boardId]?.cards[cardId]);
 }
 
 /**
@@ -289,4 +362,13 @@ export function useCard(boardId: string, cardId: string) {
  */
 export function useBoardActions() {
   return useBoardsStore.getState();
+}
+
+export function boardActions() {
+  return useBoardsStore.getState();
+}
+
+/** Latest board at call time, for event handlers that build menus lazily. */
+export function getBoard(boardId: string): Board | undefined {
+  return useBoardsStore.getState().boards[boardId];
 }

@@ -11,13 +11,14 @@ import type { Edge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/types";
 import { useEffect, useRef, useState } from "react";
 import { AddCardForm } from "@/components/kanban/AddCardForm";
 import { CardItem } from "@/components/kanban/CardItem";
+import { columnMenu } from "@/components/kanban/menus";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Field";
-import { Menu, MenuItem, MenuSeparator } from "@/components/ui/Menu";
+import { MenuButton, openContextMenu } from "@/components/ui/ContextMenu";
+import { Field, Input } from "@/components/ui/Field";
 import { Modal } from "@/components/ui/Modal";
 import { cn } from "@/helpers/cn";
 import { columnDragData, columnDropData, isCardData, isColumnData } from "@/helpers/dnd";
-import { useBoardActions } from "@/store/boards";
+import { getBoard, useBoardActions } from "@/store/boards";
 import type { Card, Column, Label } from "@/types/kanban";
 
 type Props = {
@@ -25,9 +26,11 @@ type Props = {
   column: Column;
   cards: Card[];
   labels: Label[];
-  columns: Column[];
-  index: number;
   filtered: boolean;
+  selectedId: string | null;
+  composerOpen: boolean;
+  onComposerChange: (open: boolean) => void;
+  onSelectCard: (cardId: string) => void;
   onOpenCard: (cardId: string) => void;
 };
 
@@ -36,9 +39,11 @@ export function ColumnView({
   column,
   cards,
   labels,
-  columns,
-  index,
   filtered,
+  selectedId,
+  composerOpen,
+  onComposerChange,
+  onSelectCard,
   onOpenCard,
 }: Props) {
   const rootRef = useRef<HTMLElement>(null);
@@ -50,7 +55,7 @@ export function ColumnView({
   const [cardOver, setCardOver] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [title, setTitle] = useState(column.title);
-  const [wipLimit, setWipLimit] = useState(column.wipLimit?.toString() ?? "");
+  const [wipLimit, setWipLimit] = useState("");
 
   useEffect(() => {
     const element = rootRef.current;
@@ -95,6 +100,12 @@ export function ColumnView({
 
   const overLimit = column.wipLimit !== null && column.cardIds.length > column.wipLimit;
 
+  function openSettings() {
+    setTitle(column.title);
+    setWipLimit(column.wipLimit?.toString() ?? "");
+    setSettingsOpen(true);
+  }
+
   function saveSettings() {
     actions.renameColumn(boardId, column.id, title);
     const parsed = Number.parseInt(wipLimit, 10);
@@ -102,88 +113,52 @@ export function ColumnView({
     setSettingsOpen(false);
   }
 
+  const entries = () => {
+    const board = getBoard(boardId);
+    return board
+      ? columnMenu(board, column.id, {
+          onAddCard: () => onComposerChange(true),
+          onEdit: openSettings,
+        })
+      : [];
+  };
+
   return (
     <section
       ref={rootRef}
+      onContextMenu={(event) => openContextMenu(event, entries())}
       className={cn(
-        "relative flex h-full w-[85vw] shrink-0 snap-start flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950/60 sm:w-72",
+        "relative flex max-h-full w-[85vw] shrink-0 snap-start flex-col rounded-xl border bg-surface/80 transition-colors sm:w-[18.5rem]",
+        cardOver ? "border-accent/50 bg-accent/[0.04]" : "border-line",
         dragging && "opacity-40",
-        cardOver && "border-zinc-600",
       )}
     >
-      {edge === "left" ? <DropLine position="-left-1.5" /> : null}
-      {edge === "right" ? <DropLine position="-right-1.5" /> : null}
+      {edge === "left" ? <DropLine position="-left-[7px]" /> : null}
+      {edge === "right" ? <DropLine position="-right-[7px]" /> : null}
 
       <div
         ref={headerRef}
-        className="flex cursor-grab items-center justify-between gap-2 border-b border-zinc-800 px-3 py-2.5 active:cursor-grabbing"
+        onDoubleClick={openSettings}
+        className="flex cursor-grab items-center justify-between gap-2 py-2.5 pr-2 pl-3.5 active:cursor-grabbing"
       >
         <div className="flex min-w-0 items-center gap-2">
-          <h2 className="truncate text-sm font-medium">{column.title}</h2>
+          <h2 className="truncate text-[13px] font-extrabold tracking-wide text-zinc-100 uppercase">
+            {column.title}
+          </h2>
           <span
             className={cn(
-              "rounded px-1.5 py-0.5 text-[11px]",
-              overLimit ? "bg-amber-500/15 text-amber-300" : "bg-zinc-800 text-zinc-400",
+              "rounded-md px-1.5 py-0.5 font-mono text-[11px] font-semibold",
+              overLimit ? "bg-amber-500/15 text-amber-300" : "bg-white/[0.05] text-zinc-500",
             )}
           >
             {column.cardIds.length}
             {column.wipLimit !== null ? `/${column.wipLimit}` : ""}
           </span>
         </div>
-        <Menu label={`Column options for ${column.title}`}>
-          {(close) => (
-            <>
-              <MenuItem
-                onClick={() => {
-                  setTitle(column.title);
-                  setWipLimit(column.wipLimit?.toString() ?? "");
-                  setSettingsOpen(true);
-                  close();
-                }}
-              >
-                Edit column
-              </MenuItem>
-              <MenuItem
-                disabled={index === 0}
-                onClick={() => {
-                  actions.moveColumn(boardId, column.id, index - 1);
-                  close();
-                }}
-              >
-                Move left
-              </MenuItem>
-              <MenuItem
-                disabled={index === columns.length - 1}
-                onClick={() => {
-                  actions.moveColumn(boardId, column.id, index + 1);
-                  close();
-                }}
-              >
-                Move right
-              </MenuItem>
-              <MenuSeparator />
-              <MenuItem
-                danger
-                onClick={() => {
-                  if (
-                    column.cardIds.length === 0 ||
-                    confirm(
-                      `Delete "${column.title}" and its ${column.cardIds.length} cards?`,
-                    )
-                  ) {
-                    actions.deleteColumn(boardId, column.id);
-                  }
-                  close();
-                }}
-              >
-                Delete column
-              </MenuItem>
-            </>
-          )}
-        </Menu>
+        <MenuButton label={`Actions for column ${column.title}`} entries={entries} />
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-2">
+      <div className="flex min-h-16 flex-1 flex-col gap-2 overflow-y-auto px-2 pt-0.5 pb-2">
         {cards.map((card) => (
           <CardItem
             key={card.id}
@@ -191,19 +166,25 @@ export function ColumnView({
             columnId={column.id}
             card={card}
             labels={labels}
-            columns={columns}
+            selected={card.id === selectedId}
+            onSelect={onSelectCard}
             onOpen={() => onOpenCard(card.id)}
           />
         ))}
         {cards.length === 0 ? (
-          <p className="px-1 py-6 text-center text-xs text-zinc-600">
+          <p className="rounded-lg border border-dashed border-line px-3 py-6 text-center text-xs font-medium text-zinc-600">
             {filtered ? "No cards match the filter" : "Drop cards here"}
           </p>
         ) : null}
       </div>
 
-      <div className="border-t border-zinc-800 p-2">
-        <AddCardForm boardId={boardId} columnId={column.id} />
+      <div className="px-2 pb-2">
+        <AddCardForm
+          boardId={boardId}
+          columnId={column.id}
+          open={composerOpen}
+          onOpenChange={onComposerChange}
+        />
       </div>
 
       <Modal
@@ -212,41 +193,39 @@ export function ColumnView({
         title="Edit column"
         footer={
           <>
-            <Button onClick={() => setSettingsOpen(false)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => setSettingsOpen(false)}>
+              Cancel
+            </Button>
             <Button variant="primary" onClick={saveSettings}>
               Save
             </Button>
           </>
         }
       >
-        <div className="space-y-4">
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium tracking-wide text-zinc-400 uppercase">
-              Title
-            </span>
+        <form
+          className="space-y-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            saveSettings();
+          }}
+        >
+          <Field label="Title">
+            <Input value={title} onChange={(event) => setTitle(event.target.value)} />
+          </Field>
+          <Field label="WIP limit">
             <Input
-              className="w-full"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-            />
-          </label>
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium tracking-wide text-zinc-400 uppercase">
-              WIP limit
-            </span>
-            <Input
-              className="w-full"
               type="number"
               min={0}
               placeholder="No limit"
               value={wipLimit}
               onChange={(event) => setWipLimit(event.target.value)}
             />
-            <span className="text-xs text-zinc-500">
-              Leave empty for no limit. Going over the limit turns the count amber.
-            </span>
-          </label>
-        </div>
+          </Field>
+          <p className="text-xs text-zinc-500">
+            Leave the limit empty for none. Going over it turns the count amber.
+          </p>
+          <button type="submit" hidden />
+        </form>
       </Modal>
     </section>
   );
@@ -254,6 +233,6 @@ export function ColumnView({
 
 function DropLine({ position }: { position: string }) {
   return (
-    <div className={cn("absolute inset-y-0 z-10 w-0.5 rounded bg-indigo-500", position)} />
+    <div className={cn("absolute inset-y-2 z-10 w-0.5 rounded-full bg-accent", position)} />
   );
 }
