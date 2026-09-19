@@ -76,6 +76,7 @@ export function createCard(title: string): Card {
     id: newId("card"),
     title,
     description: "",
+    checklist: [],
     labelIds: [],
     priority: "none",
     dueDate: null,

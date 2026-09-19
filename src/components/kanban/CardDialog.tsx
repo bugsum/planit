@@ -1,6 +1,8 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState } from "react";
+import { Checklist } from "@/components/kanban/Checklist";
 import { Button } from "@/components/ui/Button";
 import { Field, FieldLabel, Input, Select, TextArea } from "@/components/ui/Field";
 import { CloseIcon } from "@/components/ui/Icons";
@@ -16,6 +18,9 @@ import { cn } from "@/helpers/cn";
 import { useBoardActions } from "@/store/boards";
 import type { Card, Label, LabelColor, Priority } from "@/types/kanban";
 
+// The markdown renderer only loads once a card is opened, keeping the board bundle lean.
+const Markdown = dynamic(() => import("@/components/kanban/Markdown").then((mod) => mod.Markdown));
+
 type Props = {
   boardId: string;
   card: Card;
@@ -28,6 +33,10 @@ export function CardDialog({ boardId, card, labels, onClose }: Props) {
   const [newLabel, setNewLabel] = useState("");
   const [newColor, setNewColor] = useState<LabelColor>("indigo");
   const [managingLabels, setManagingLabels] = useState(false);
+  // "empty" shows the textarea without stealing focus from the title on open.
+  const [notesMode, setNotesMode] = useState<"preview" | "edit" | "empty">(
+    card.description.trim() ? "preview" : "empty",
+  );
 
   const update = (patch: Partial<Card>) => actions.updateCard(boardId, card.id, patch);
 
@@ -86,14 +95,61 @@ export function CardDialog({ boardId, card, labels, onClose }: Props) {
           </p>
         </div>
 
-        <Field label="Description">
-          <TextArea
-            rows={5}
-            placeholder="Notes, acceptance criteria, links…"
-            value={card.description}
-            onChange={(event) => update({ description: event.target.value })}
-          />
-        </Field>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <FieldLabel>Description</FieldLabel>
+            {notesMode === "preview" ? (
+              <button
+                type="button"
+                onClick={() => setNotesMode("edit")}
+                className="text-xs font-semibold text-zinc-500 transition-colors hover:text-zinc-200"
+              >
+                Edit
+              </button>
+            ) : (
+              <span className="text-[11px] text-zinc-600">Markdown supported</span>
+            )}
+          </div>
+          {notesMode === "preview" ? (
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Edit description"
+              onClick={(event) => {
+                if (!(event.target as Element).closest("a")) setNotesMode("edit");
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  setNotesMode("edit");
+                }
+              }}
+              className="-mx-3 cursor-text rounded-lg border border-transparent px-3 py-2 transition-colors hover:border-line"
+            >
+              <Markdown>{card.description}</Markdown>
+            </div>
+          ) : (
+            <TextArea
+              autoFocus={notesMode === "edit"}
+              rows={6}
+              placeholder="Notes, acceptance criteria, links… **Markdown** works."
+              value={card.description}
+              onChange={(event) => update({ description: event.target.value })}
+              onBlur={() => {
+                if (card.description.trim()) setNotesMode("preview");
+              }}
+              onKeyDown={(event) => {
+                // First Esc leaves editing; the next one closes the dialog.
+                if (event.key === "Escape" && card.description.trim()) {
+                  event.preventDefault();
+                  setNotesMode("preview");
+                }
+              }}
+            />
+          )}
+        </div>
+
+        <Checklist boardId={boardId} card={card} />
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Priority">

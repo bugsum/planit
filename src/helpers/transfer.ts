@@ -1,6 +1,8 @@
-import type { Board, Card, Column, Label } from "@/types/kanban";
+import { newId } from "@/helpers/id";
+import type { Board, Card, ChecklistItem, Column, Label } from "@/types/kanban";
 
-const FILE_VERSION = 1;
+// v2 added card checklists; v1 files import with empty checklists.
+const FILE_VERSION = 2;
 
 type BoardFile = {
   app: "plan-it";
@@ -66,6 +68,7 @@ export function parseBoardFile(text: string): ParseResult {
       id,
       title: value.title,
       description: typeof value.description === "string" ? value.description : "",
+      checklist: repairChecklist(value.checklist),
       labelIds: Array.isArray(value.labelIds) ? value.labelIds : [],
       priority: value.priority ?? "none",
       dueDate: typeof value.dueDate === "string" ? value.dueDate : null,
@@ -105,4 +108,15 @@ export function parseBoardFile(text: string): ParseResult {
       updatedAt: now,
     },
   };
+}
+
+function repairChecklist(value: unknown): ChecklistItem[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((item): item is Partial<ChecklistItem> => typeof item === "object" && item !== null)
+    .map((item) => ({
+      id: typeof item.id === "string" && item.id ? item.id : newId("item"),
+      text: typeof item.text === "string" ? item.text : "",
+      done: item.done === true,
+    }));
 }

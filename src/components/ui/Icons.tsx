@@ -112,6 +112,14 @@ export function TagIcon(props: IconProps) {
   );
 }
 
+export function NotesIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 6h16M4 12h16M4 18h10" />
+    </Icon>
+  );
+}
+
 export function FilterIcon(props: IconProps) {
   return (
     <Icon {...props}>

@@ -15,10 +15,18 @@ export type Label = {
   color: LabelColor;
 };
 
+export type ChecklistItem = {
+  id: string;
+  text: string;
+  done: boolean;
+};
+
 export type Card = {
   id: string;
   title: string;
+  /** Markdown. */
   description: string;
+  checklist: ChecklistItem[];
   labelIds: string[];
   priority: Priority;
   dueDate: string | null;

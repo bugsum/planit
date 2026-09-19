@@ -9,10 +9,11 @@ import { attachClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/clos
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge/extract-closest-edge";
 import type { Edge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/types";
 import { useEffect, useRef, useState } from "react";
+import { checklistProgress } from "@/components/kanban/Checklist";
 import { cardMenu } from "@/components/kanban/menus";
 import { Badge } from "@/components/ui/Badge";
 import { MenuButton, openContextMenu } from "@/components/ui/ContextMenu";
-import { CalendarIcon } from "@/components/ui/Icons";
+import { CalendarIcon, CheckIcon, NotesIcon } from "@/components/ui/Icons";
 import {
   LABEL_CLASSES,
   PRIORITY_CLASSES,
@@ -88,6 +89,8 @@ export function CardItem({
     .map((id) => labels.find((label) => label.id === id))
     .filter((label): label is Label => Boolean(label));
   const overdue = isOverdue(card.dueDate);
+  const progress = checklistProgress(card);
+  const hasNotes = card.description.trim().length > 0;
   const stripe = PRIORITY_STRIPE[card.priority];
 
   return (
@@ -129,7 +132,11 @@ export function CardItem({
           />
         </div>
 
-        {cardLabels.length > 0 || card.priority !== "none" || card.dueDate ? (
+        {cardLabels.length > 0 ||
+        card.priority !== "none" ||
+        card.dueDate ||
+        progress.total > 0 ||
+        hasNotes ? (
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             {card.priority !== "none" ? (
               <Badge className={PRIORITY_CLASSES[card.priority]}>
@@ -151,6 +158,23 @@ export function CardItem({
                 <CalendarIcon width={11} height={11} />
                 {formatDate(card.dueDate)}
               </Badge>
+            ) : null}
+            {progress.total > 0 ? (
+              <Badge
+                className={
+                  progress.done === progress.total
+                    ? "border-emerald-500/30 bg-emerald-500/15 text-emerald-300"
+                    : "border-line-strong bg-white/[0.03] text-zinc-400"
+                }
+              >
+                <CheckIcon width={11} height={11} />
+                {progress.done}/{progress.total}
+              </Badge>
+            ) : null}
+            {hasNotes ? (
+              <span title="Has notes" className="text-zinc-500">
+                <NotesIcon width={13} height={13} />
+              </span>
             ) : null}
           </div>
         ) : null}

@@ -13,7 +13,7 @@ import {
 } from "@/helpers/board";
 import { newId } from "@/helpers/id";
 import { planitStorage, subscribeToExternalChanges } from "@/helpers/storage";
-import type { Board, Card, Label, LabelColor } from "@/types/kanban";
+import type { Board, Card, ChecklistItem, Label, LabelColor } from "@/types/kanban";
 
 const STORAGE_KEY = "planit.kanban.v1";
 const HISTORY_LIMIT = 100;
@@ -53,6 +53,15 @@ type BoardsState = {
   addLabel: (boardId: string, name: string, color: LabelColor) => void;
   updateLabel: (boardId: string, labelId: string, patch: Partial<Label>) => void;
   deleteLabel: (boardId: string, labelId: string) => void;
+  addChecklistItem: (boardId: string, cardId: string, text: string, index?: number) => string;
+  updateChecklistItem: (
+    boardId: string,
+    cardId: string,
+    itemId: string,
+    patch: Partial<Pick<ChecklistItem, "text" | "done">>,
+  ) => void;
+  removeChecklistItem: (boardId: string, cardId: string, itemId: string) => void;
+  moveChecklistItem: (boardId: string, cardId: string, itemId: string, toIndex: number) => void;
   undo: (boardId: string) => void;
   redo: (boardId: string) => void;
 };
@@ -202,6 +211,7 @@ export const useBoardsStore = create<BoardsState>()(
             ...source,
             id: newId("card"),
             labelIds: [...source.labelIds],
+            checklist: source.checklist.map((item) => ({ ...item, id: newId("item") })),
             createdAt: now,
             updatedAt: now,
           };
@@ -260,6 +270,54 @@ export const useBoardsStore = create<BoardsState>()(
             }
           }),
 
+        addChecklistItem: (boardId, cardId, text, index) => {
+          const item: ChecklistItem = { id: newId("item"), text, done: false };
+          edit(boardId, (board) => {
+            const card = board.cards[cardId];
+            if (!card) return false;
+            const at = Math.max(0, Math.min(index ?? card.checklist.length, card.checklist.length));
+            card.checklist.splice(at, 0, item);
+            card.updatedAt = new Date().toISOString();
+          });
+          return item.id;
+        },
+
+        updateChecklistItem: (boardId, cardId, itemId, patch) =>
+          edit(
+            boardId,
+            (board) => {
+              const card = board.cards[cardId];
+              const item = card?.checklist.find((i) => i.id === itemId);
+              if (!card || !item) return false;
+              const unchanged =
+                (patch.text === undefined || patch.text === item.text) &&
+                (patch.done === undefined || patch.done === item.done);
+              if (unchanged) return false;
+              Object.assign(item, patch);
+              card.updatedAt = new Date().toISOString();
+            },
+            patch.text !== undefined ? `item:${itemId}:text` : undefined,
+          ),
+
+        removeChecklistItem: (boardId, cardId, itemId) =>
+          edit(boardId, (board) => {
+            const card = board.cards[cardId];
+            if (!card?.checklist.some((i) => i.id === itemId)) return false;
+            card.checklist = card.checklist.filter((i) => i.id !== itemId);
+            card.updatedAt = new Date().toISOString();
+          }),
+
+        moveChecklistItem: (boardId, cardId, itemId, toIndex) =>
+          edit(boardId, (board) => {
+            const card = board.cards[cardId];
+            if (!card) return false;
+            const from = card.checklist.findIndex((i) => i.id === itemId);
+            const to = Math.max(0, Math.min(toIndex, card.checklist.length - 1));
+            if (from < 0 || from === to) return false;
+            card.checklist = moveInArray(card.checklist, from, to);
+            card.updatedAt = new Date().toISOString();
+          }),
+
         undo: (boardId) => {
           const current = get().boards[boardId];
           const past = get().history[boardId]?.past;
@@ -291,12 +349,21 @@ export const useBoardsStore = create<BoardsState>()(
     }),
     {
       name: STORAGE_KEY,
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => planitStorage),
       skipHydration: true,
       partialize: (state) =>
         ({ boards: state.boards, boardOrder: state.boardOrder }) as BoardsState,
-      migrate: (persisted) => persisted as BoardsState,
+      migrate: (persisted, version) => {
+        const state = persisted as Pick<BoardsState, "boards" | "boardOrder">;
+        // v2 added card checklists.
+        if (version < 2) {
+          for (const board of Object.values(state.boards ?? {})) {
+            for (const card of Object.values(board.cards)) card.checklist ??= [];
+          }
+        }
+        return state as BoardsState;
+      },
     },
   ),
 );
