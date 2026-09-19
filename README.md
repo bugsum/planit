@@ -9,6 +9,14 @@
   Planning tools for the part of a project that happens before the first commit.
 </p>
 
+<p align="center">
+  <a href="https://planit.iamsamarth.xyz"><img alt="Live demo" src="https://img.shields.io/badge/demo-planit.iamsamarth.xyz-2563eb" /></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/bugsum/planit" /></a>
+  <a href="https://github.com/bugsum/planit/releases"><img alt="Release" src="https://img.shields.io/github/v/release/bugsum/planit" /></a>
+  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-black" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178c6" />
+</p>
+
 Most planning apps are built around executing work. Plan It is built around
 shaping it — the backlog you rewrite three times, the ideas that are not tasks
 yet, the structure you want settled before you start typing. Kanban is the first
