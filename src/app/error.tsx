@@ -20,8 +20,8 @@ export default function ErrorPage({
       <p className="font-mono text-sm font-bold text-red-400">Error</p>
       <h1 className="mt-2 text-4xl font-black tracking-tighter sm:text-5xl">Something broke.</h1>
       <p className="mt-4 text-[15px] text-zinc-400">
-        A display error doesn&apos;t erase anything — your boards stay stored in this browser.
-        Try again, or head back to your boards.
+        A display error doesn&apos;t erase anything — your boards stay stored in this browser. Try
+        again, or head back to your boards.
       </p>
       {error.digest ? (
         <p className="mt-3 font-mono text-xs text-zinc-600">Reference: {error.digest}</p>

@@ -42,8 +42,7 @@ export function useHotkeys(hotkeys: Hotkey[]) {
     const mac = isMac();
     const hotkey = hotkeys.find(
       (entry) =>
-        (!editing || entry.inFields) &&
-        entry.keys.some((combo) => matchesCombo(event, combo, mac)),
+        (!editing || entry.inFields) && entry.keys.some((combo) => matchesCombo(event, combo, mac)),
     );
     if (!hotkey) return;
     event.preventDefault();

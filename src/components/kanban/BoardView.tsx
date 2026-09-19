@@ -23,13 +23,7 @@ import { commandsFromMenu } from "@/helpers/menu";
 import { SHORTCUTS, formatCombo } from "@/helpers/shortcuts";
 import { useHydrated } from "@/helpers/use-hydrated";
 import { useIsMac, wantsNativeMenu } from "@/helpers/use-hotkeys";
-import {
-  getBoard,
-  useBoard,
-  useBoardActions,
-  useBoardsStore,
-  useUndoState,
-} from "@/store/boards";
+import { getBoard, useBoard, useBoardActions, useBoardsStore, useUndoState } from "@/store/boards";
 import { useRegisterCardOpener, useRegisterCommands } from "@/store/ui";
 import type { BoardFilters } from "@/types/kanban";
 

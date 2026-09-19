@@ -7,10 +7,7 @@ export type MenuItemEntry = {
   disabled?: boolean;
 };
 
-export type MenuEntry =
-  | MenuItemEntry
-  | { kind: "separator" }
-  | { kind: "label"; label: string };
+export type MenuEntry = MenuItemEntry | { kind: "separator" } | { kind: "label"; label: string };
 
 export type MenuRequest = {
   x: number;

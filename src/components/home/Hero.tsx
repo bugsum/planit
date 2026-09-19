@@ -16,7 +16,7 @@ export function Hero() {
     <section className="relative overflow-hidden">
       <div
         aria-hidden="true"
-        className="bg-grid pointer-events-none absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_70%_55%_at_50%_0%,black,transparent)]"
+        className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(ellipse_70%_55%_at_50%_0%,black,transparent)] opacity-50"
       />
       <div
         aria-hidden="true"
@@ -45,8 +45,8 @@ export function Hero() {
 
           <p className="mx-auto mt-6 max-w-2xl animate-fade-up text-lg leading-relaxed text-pretty text-zinc-400 [animation-delay:160ms] sm:text-xl">
             <strong className="font-bold text-zinc-100">Plan It</strong> is the workspace for
-            everything that happens before the first commit — the backlog, the ideas, the order
-            you will ship in. Settle the shape of the work first, and{" "}
+            everything that happens before the first commit — the backlog, the ideas, the order you
+            will ship in. Settle the shape of the work first, and{" "}
             <strong className="font-bold text-zinc-100">stop rewriting it later.</strong>
           </p>
 

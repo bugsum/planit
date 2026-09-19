@@ -88,7 +88,7 @@ export function CardDialog({ boardId, card, labels, onClose }: Props) {
             aria-label="Card title"
             value={card.title}
             onChange={(event) => update({ title: event.target.value })}
-            className="w-full rounded-lg border border-transparent bg-transparent px-2 py-1 -mx-2 text-2xl font-extrabold tracking-tight text-zinc-50 transition-colors hover:border-line focus:border-accent/70 focus:outline-none"
+            className="-mx-2 w-full rounded-lg border border-transparent bg-transparent px-2 py-1 text-2xl font-extrabold tracking-tight text-zinc-50 transition-colors hover:border-line focus:border-accent/70 focus:outline-none"
           />
           <p className="mt-1 text-xs text-zinc-500">
             Created {formatRelative(card.createdAt)} · edited {formatRelative(card.updatedAt)}

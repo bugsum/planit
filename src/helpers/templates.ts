@@ -13,7 +13,12 @@ export const TEMPLATES: BoardTemplate[] = [
     id: "classic",
     name: "Classic",
     description: "The four columns most plans start with.",
-    columns: [{ title: "Backlog" }, { title: "To Do" }, { title: "In Progress" }, { title: "Done" }],
+    columns: [
+      { title: "Backlog" },
+      { title: "To Do" },
+      { title: "In Progress" },
+      { title: "Done" },
+    ],
     labels: [
       { name: "Feature", color: "indigo" },
       { name: "Bug", color: "red" },

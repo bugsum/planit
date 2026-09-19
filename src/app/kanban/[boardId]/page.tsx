@@ -7,10 +7,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-export default async function BoardPage({
-  params,
-  searchParams,
-}: PageProps<"/kanban/[boardId]">) {
+export default async function BoardPage({ params, searchParams }: PageProps<"/kanban/[boardId]">) {
   const { boardId } = await params;
   const { card } = await searchParams;
   // Keyed by board so switching boards starts fresh (filters, selection, open card).

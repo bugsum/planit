@@ -7,6 +7,7 @@ All notable changes are documented here. Format based on [Keep a Changelog](http
 ## [0.1.0] - 2026-09-19
 
 ### Added
+
 - Kanban planner: multiple boards, custom columns with optional WIP limits, cards with labels, priority and due dates
 - Drag and drop for cards and columns
 - Keyboard shortcuts and context menus

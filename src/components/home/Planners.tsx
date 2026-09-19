@@ -19,7 +19,11 @@ const PLANNERS: Planner[] = [
     status: "Live",
     icon: ColumnsIcon,
     body: "Turn a pile of ideas into an ordered backlog and walk it to done.",
-    points: ["Custom columns and WIP limits", "Keyboard control and context menus", "Labels, priority, due dates"],
+    points: [
+      "Custom columns and WIP limits",
+      "Keyboard control and context menus",
+      "Labels, priority, due dates",
+    ],
     href: "/kanban",
   },
   {

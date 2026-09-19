@@ -93,17 +93,15 @@ export function BoardList() {
   return (
     <div
       className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6 sm:py-14"
-      onContextMenu={(event) =>
-        openContextMenu(event, listActions())
-      }
+      onContextMenu={(event) => openContextMenu(event, listActions())}
     >
       <div className="flex flex-wrap items-end justify-between gap-6">
         <div>
           <p className="text-xs font-bold tracking-[0.2em] text-accent-light uppercase">Kanban</p>
           <h1 className="mt-2 text-4xl font-extrabold tracking-tight sm:text-5xl">Your boards</h1>
           <p className="mt-3 max-w-md text-[15px] text-zinc-400">
-            Saved in this browser. Right-click anywhere for actions, or press{" "}
-            <Kbd>?</Kbd> for every shortcut.
+            Saved in this browser. Right-click anywhere for actions, or press <Kbd>?</Kbd> for every
+            shortcut.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -150,8 +148,7 @@ export function BoardList() {
         <div className="mt-10 rounded-2xl border border-dashed border-line-strong px-6 py-20 text-center">
           <p className="text-3xl font-extrabold tracking-tight">Start your first plan.</p>
           <p className="mx-auto mt-3 max-w-sm text-[15px] text-zinc-400">
-            A board starts with Backlog, To Do, In Progress and Done. Rename or replace any of
-            them.
+            A board starts with Backlog, To Do, In Progress and Done. Rename or replace any of them.
           </p>
           <div className="mt-8 flex justify-center gap-2">
             <Button variant="primary" size="lg" onClick={startCreate}>
