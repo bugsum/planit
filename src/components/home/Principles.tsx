@@ -15,7 +15,10 @@ const PRINCIPLES = [
 
 export function Principles() {
   return (
-    <section className="border-y border-line bg-surface/40">
+    <section aria-labelledby="principles-title" className="border-y border-line bg-surface/40">
+      <h2 id="principles-title" className="sr-only">
+        Why plan first
+      </h2>
       <div className="mx-auto grid max-w-7xl gap-px bg-line sm:grid-cols-3">
         {PRINCIPLES.map((principle, index) => (
           <div key={principle.title} className="bg-canvas px-6 py-12 sm:px-8 sm:py-14">

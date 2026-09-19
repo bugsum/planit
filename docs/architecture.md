@@ -136,6 +136,24 @@ The PNGs are rendered from the SVG so every size matches.
 The homepage is fully static server components; the only client code it ships
 is the platform-aware key chips and the app-wide overlays.
 
+## SEO (`src/helpers/seo.ts`, `src/helpers/site.ts`)
+
+`SITE.url` is the production origin and feeds `metadataBase`, so every
+canonical, Open Graph and sitemap URL is absolute.
+
+- `src/app/robots.ts` and `src/app/sitemap.ts` generate `/robots.txt` and
+  `/sitemap.xml`. Only `/` and `/kanban` are listed; board pages are
+  `noindex` because boards live in each visitor's browser.
+- `src/app/opengraph-image.png` / `twitter-image.png` (1280×640, with `.alt.txt`
+  files) are the social preview for every route.
+- Canonicals are set per page, never in the root layout, or every page would
+  claim to be `/`.
+- Next shallow-merges metadata: a page that sets `openGraph` or `twitter` loses
+  the layout's values, including the inherited image. Such pages spread
+  `baseOpenGraph` and add `socialImage`.
+- The homepage renders JSON-LD (WebSite, Organization with the logo,
+  SoftwareApplication) through `jsonLdScript`, which escapes `<`.
+
 ## Import / export (`src/helpers/transfer.ts`)
 
 Boards export as `{ app, kind, version, board }` JSON. Import validates and

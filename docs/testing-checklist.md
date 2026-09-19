@@ -16,6 +16,21 @@ UI refresh; tick them as you go.
 - [ ] Mobile browser UI (address bar) is tinted to the dark canvas color
 - [ ] README on GitHub shows the logo above the title
 
+## SEO and social previews
+
+Run these against the deployed site (https://planit.iamsamarth.xyz).
+
+- [ ] `/robots.txt` allows everything and points to the sitemap
+- [ ] `/sitemap.xml` lists `/` and `/kanban`
+- [ ] View source on `/`: canonical, description, Open Graph and Twitter tags,
+      and a JSON-LD script (WebSite, Organization, SoftwareApplication)
+- [ ] `/kanban` has its own title, description, canonical and social image
+- [ ] A board URL has `<meta name="robots" content="noindex, follow">`
+- [ ] Share the homepage link in Slack/Discord/X: large card with the logo image
+- [ ] https://www.opengraph.xyz or LinkedIn Post Inspector shows the preview
+- [ ] Google Rich Results Test parses the JSON-LD without errors
+- [ ] Submit the sitemap in Google Search Console
+
 ## Homepage
 
 - [ ] Hero, principles, features, keyboard, planners, how-it-works and closing
