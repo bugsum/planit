@@ -4,11 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/app/Logo";
 import { iconButtonClasses } from "@/components/ui/Button";
-import { GithubIcon, KeyboardIcon } from "@/components/ui/Icons";
-import { Kbd } from "@/components/ui/Kbd";
+import { GithubIcon, KeyboardIcon, SearchIcon } from "@/components/ui/Icons";
+import { Combo, Kbd } from "@/components/ui/Kbd";
 import { cn } from "@/helpers/cn";
 import { SITE } from "@/helpers/site";
-import { openShortcuts } from "@/store/ui";
+import { SHORTCUTS } from "@/helpers/shortcuts";
+import { openPalette, openShortcuts } from "@/store/ui";
 
 const NAV = [{ href: "/kanban", label: "Kanban" }];
 
@@ -49,6 +50,16 @@ export function TopBar() {
         </div>
 
         <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={openPalette}
+            aria-label="Search and run commands"
+            className="mr-1 inline-flex h-8 items-center gap-2 rounded-lg border border-line px-2.5 text-[13px] font-medium text-zinc-500 transition-colors hover:border-line-strong hover:text-zinc-200 md:w-52"
+          >
+            <SearchIcon />
+            <span className="hidden flex-1 text-left md:inline">Search…</span>
+            <Combo combo={SHORTCUTS.palette.keys[0]} className="hidden md:inline-flex" />
+          </button>
           <button
             type="button"
             onClick={openShortcuts}

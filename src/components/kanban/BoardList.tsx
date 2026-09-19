@@ -12,12 +12,14 @@ import { Combo, Kbd } from "@/components/ui/Kbd";
 import { Modal } from "@/components/ui/Modal";
 import { LABEL_DOT_CLASSES, countCards, findLabel, formatRelative } from "@/helpers/board";
 import { cn } from "@/helpers/cn";
+import { commandsFromMenu } from "@/helpers/menu";
 import { SHORTCUTS } from "@/helpers/shortcuts";
 import { requestPersistentStorage } from "@/helpers/storage";
 import { parseBoardFile } from "@/helpers/transfer";
 import { useHotkeys } from "@/helpers/use-hotkeys";
 import { useHydrated } from "@/helpers/use-hydrated";
 import { useBoardActions, useBoardList, useBoardsStore } from "@/store/boards";
+import { useRegisterCommands, useUiStore } from "@/store/ui";
 import type { Board } from "@/types/kanban";
 
 export function BoardList() {
@@ -28,6 +30,9 @@ export function BoardList() {
   const fileInput = useRef<HTMLInputElement>(null);
 
   const [creating, setCreating] = useState(false);
+  // "New board" from the palette on another page arrives as a pending request.
+  const pendingNewBoard = useUiStore((state) => state.pendingNewBoard);
+  const createOpen = creating || pendingNewBoard;
   const [renaming, setRenaming] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [error, setError] = useState("");
@@ -35,6 +40,11 @@ export function BoardList() {
   function startCreate() {
     setName("");
     setCreating(true);
+  }
+
+  function closeCreate() {
+    setCreating(false);
+    useUiStore.setState({ pendingNewBoard: false });
   }
 
   function startImport() {
@@ -49,7 +59,7 @@ export function BoardList() {
   function create() {
     requestPersistentStorage();
     const id = actions.createBoard(name);
-    setCreating(false);
+    closeCreate();
     router.push(`/kanban/${id}`);
   }
 
@@ -69,16 +79,19 @@ export function BoardList() {
     router.push(`/kanban/${actions.importBoard(result.board)}`);
   }
 
+  const listActions = () => boardListMenu({ onNewBoard: startCreate, onImport: startImport });
+
   useHotkeys([
     { keys: SHORTCUTS.newBoard.keys, handler: startCreate },
     { keys: SHORTCUTS.importBoard.keys, handler: startImport },
   ]);
+  useRegisterCommands(() => commandsFromMenu(listActions(), "Boards list"));
 
   return (
     <div
       className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6 sm:py-14"
       onContextMenu={(event) =>
-        openContextMenu(event, boardListMenu({ onNewBoard: startCreate, onImport: startImport }))
+        openContextMenu(event, listActions())
       }
     >
       <div className="flex flex-wrap items-end justify-between gap-6">
@@ -169,12 +182,12 @@ export function BoardList() {
       )}
 
       <Modal
-        open={creating}
-        onClose={() => setCreating(false)}
+        open={createOpen}
+        onClose={closeCreate}
         title="New board"
         footer={
           <>
-            <Button variant="ghost" onClick={() => setCreating(false)}>
+            <Button variant="ghost" onClick={closeCreate}>
               Cancel
             </Button>
             <Button variant="primary" onClick={create}>

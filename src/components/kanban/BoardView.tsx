@@ -19,6 +19,7 @@ import { MouseIcon, PlusIcon, RedoIcon, UndoIcon } from "@/components/ui/Icons";
 import { Kbd } from "@/components/ui/Kbd";
 import { countCards, formatRelative, isFilterActive, matchesFilters } from "@/helpers/board";
 import { isCardData, isColumnData, isColumnDropData } from "@/helpers/dnd";
+import { commandsFromMenu } from "@/helpers/menu";
 import { SHORTCUTS, formatCombo } from "@/helpers/shortcuts";
 import { useHydrated } from "@/helpers/use-hydrated";
 import { useIsMac, wantsNativeMenu } from "@/helpers/use-hotkeys";
@@ -29,13 +30,20 @@ import {
   useBoardsStore,
   useUndoState,
 } from "@/store/boards";
+import { useRegisterCardOpener, useRegisterCommands } from "@/store/ui";
 import type { BoardFilters } from "@/types/kanban";
 
 function cardElement(cardId: string) {
   return document.querySelector(`[data-card-id="${CSS.escape(cardId)}"]`);
 }
 
-export function BoardView({ boardId }: { boardId: string }) {
+type Props = {
+  boardId: string;
+  /** From `?card=`, set when the command palette jumps to a card on another board. */
+  initialCardId?: string;
+};
+
+export function BoardView({ boardId, initialCardId }: Props) {
   const router = useRouter();
   const hydrated = useHydrated(useBoardsStore);
   const board = useBoard(boardId);
@@ -47,8 +55,8 @@ export function BoardView({ boardId }: { boardId: string }) {
   const columnInputRef = useRef<HTMLInputElement>(null);
 
   const [filters, setFilters] = useState<BoardFilters>(NO_FILTERS);
-  const [openCardId, setOpenCardId] = useState<string | null>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [openCardId, setOpenCardId] = useState<string | null>(initialCardId ?? null);
+  const [selectedId, setSelectedId] = useState<string | null>(initialCardId ?? null);
   const [composerColumnId, setComposerColumnId] = useState<string | null>(null);
   const [renaming, setRenaming] = useState(false);
   const [name, setName] = useState("");
@@ -213,6 +221,26 @@ export function BoardView({ boardId }: { boardId: string }) {
     onNewColumn: startNewColumn,
     onSearch: focusSearch,
   });
+
+  useRegisterCommands(() => [
+    {
+      id: "board:new-card",
+      title: "New card",
+      group: "This board",
+      shortcut: SHORTCUTS.newCard.keys[0],
+      run: () => {
+        const lane = lanes.find((l) => selected && l.cardIds.includes(selected)) ?? lanes[0];
+        if (lane) setComposerColumnId(lane.columnId);
+      },
+    },
+    ...commandsFromMenu(boardEntries(), "This board"),
+  ]);
+  useRegisterCardOpener(boardId, openCard);
+
+  // The card id only needs to seed state once; drop it so reloads and shares stay clean.
+  useEffect(() => {
+    if (initialCardId) router.replace(`/kanban/${boardId}`, { scroll: false });
+  }, [initialCardId, boardId, router]);
 
   if (!hydrated) {
     return (

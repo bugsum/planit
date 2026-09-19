@@ -13,6 +13,7 @@ type Shortcut = {
  * `mod+shift+z`, where `mod` is ⌘ on macOS and Ctrl elsewhere.
  */
 export const SHORTCUTS = {
+  palette: { keys: ["mod+k"], label: "Search and run commands", group: "General" },
   help: { keys: ["?"], label: "Show keyboard shortcuts", group: "General" },
   escape: { keys: ["Escape"], label: "Close menu or clear selection", group: "General" },
   menu: {

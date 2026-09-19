@@ -24,3 +24,15 @@ export type MenuRequest = {
 };
 
 export type OpenMenu = MenuRequest & { id: number };
+
+export type Command = {
+  id: string;
+  title: string;
+  group: string;
+  subtitle?: string;
+  /** Extra words that should match in the palette but are not shown. */
+  keywords?: string;
+  shortcut?: string;
+  disabled?: boolean;
+  run: () => void;
+};

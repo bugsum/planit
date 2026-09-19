@@ -1,4 +1,4 @@
-import type { MenuEntry, MenuItemEntry } from "@/types/ui";
+import type { Command, MenuEntry, MenuItemEntry } from "@/types/ui";
 
 export function menuItem(
   label: string,
@@ -13,3 +13,21 @@ export function menuLabel(label: string): MenuEntry {
 }
 
 export const menuSeparator: MenuEntry = { kind: "separator" };
+
+/** Menu actions double as palette commands, so both surfaces stay in sync. */
+export function commandsFromMenu(entries: MenuEntry[], group: string): Command[] {
+  return entries.flatMap((entry) =>
+    entry.kind === "item"
+      ? [
+          {
+            id: `${group}:${entry.label}`,
+            title: entry.label.replace(/…$/, ""),
+            group,
+            shortcut: entry.shortcut,
+            disabled: entry.disabled,
+            run: entry.onSelect,
+          },
+        ]
+      : [],
+  );
+}

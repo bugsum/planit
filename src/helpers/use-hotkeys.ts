@@ -6,6 +6,8 @@ import { isMac, matchesCombo } from "@/helpers/shortcuts";
 export type Hotkey = {
   keys: string[];
   handler: (event: KeyboardEvent) => void;
+  /** Also fire while a text field has focus (for app-wide shortcuts like the palette). */
+  inFields?: boolean;
 };
 
 export function isEditableTarget(target: EventTarget | null) {
@@ -34,12 +36,14 @@ export function wantsNativeMenu(target: EventTarget | null) {
 export function useHotkeys(hotkeys: Hotkey[]) {
   const onKeyDown = useEffectEvent((event: KeyboardEvent) => {
     if (event.defaultPrevented || event.isComposing) return;
-    if (isEditableTarget(event.target)) return;
     if (document.querySelector("dialog[open]")) return;
 
+    const editing = isEditableTarget(event.target);
     const mac = isMac();
-    const hotkey = hotkeys.find((entry) =>
-      entry.keys.some((combo) => matchesCombo(event, combo, mac)),
+    const hotkey = hotkeys.find(
+      (entry) =>
+        (!editing || entry.inFields) &&
+        entry.keys.some((combo) => matchesCombo(event, combo, mac)),
     );
     if (!hotkey) return;
     event.preventDefault();
