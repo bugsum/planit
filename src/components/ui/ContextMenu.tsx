@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type MouseEvent,
-} from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
 import { iconButtonClasses } from "@/components/ui/Button";
 import { MoreIcon } from "@/components/ui/Icons";
 import { cn } from "@/helpers/cn";
@@ -133,7 +126,7 @@ function MenuPanel({ menu }: { menu: OpenMenu }) {
         else return;
         event.preventDefault();
       }}
-      className="fixed z-50 max-w-72 min-w-56 animate-pop-in rounded-xl border border-line-strong bg-raised/95 p-1 shadow-2xl shadow-black/60 outline-none backdrop-blur-md"
+      className="fixed z-50 max-w-72 min-w-56 animate-pop-in rounded-xl border border-line-strong bg-raised/95 p-1 shadow-2xl shadow-black/60 backdrop-blur-md outline-none"
     >
       {menu.entries.map((entry, index) => {
         if (entry.kind === "separator") {

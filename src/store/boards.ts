@@ -5,12 +5,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { useShallow } from "zustand/react/shallow";
-import {
-  createBoard as buildBoard,
-  createCard,
-  createColumn,
-  moveInArray,
-} from "@/helpers/board";
+import { createBoard as buildBoard, createCard, createColumn, moveInArray } from "@/helpers/board";
 import { newId } from "@/helpers/id";
 import { planitStorage, subscribeToExternalChanges } from "@/helpers/storage";
 import { findTemplate } from "@/helpers/templates";
@@ -50,12 +45,7 @@ type BoardsState = {
   updateCard: (boardId: string, cardId: string, patch: Partial<Card>) => void;
   duplicateCard: (boardId: string, cardId: string) => string | null;
   deleteCard: (boardId: string, cardId: string) => void;
-  moveCard: (
-    boardId: string,
-    cardId: string,
-    toColumnId: string,
-    toIndex: number,
-  ) => void;
+  moveCard: (boardId: string, cardId: string, toColumnId: string, toIndex: number) => void;
   addLabel: (boardId: string, name: string, color: LabelColor) => void;
   updateLabel: (boardId: string, labelId: string, patch: Partial<Label>) => void;
   deleteLabel: (boardId: string, labelId: string) => void;
@@ -417,9 +407,7 @@ export function useBoard(boardId: string) {
 
 export function useBoardList() {
   return useBoardsStore(
-    useShallow((state) =>
-      state.boardOrder.map((id) => state.boards[id]).filter(Boolean),
-    ),
+    useShallow((state) => state.boardOrder.map((id) => state.boards[id]).filter(Boolean)),
   );
 }
 

@@ -42,9 +42,7 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 export function Button({ variant, size, className, type = "button", ...props }: Props) {
-  return (
-    <button type={type} className={buttonClasses({ variant, size, className })} {...props} />
-  );
+  return <button type={type} className={buttonClasses({ variant, size, className })} {...props} />;
 }
 
 export const iconButtonClasses =

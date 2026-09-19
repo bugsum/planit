@@ -41,15 +41,7 @@ const PRIORITY_STRIPE: Partial<Record<Card["priority"], string>> = {
   urgent: "bg-red-400",
 };
 
-export function CardItem({
-  boardId,
-  columnId,
-  card,
-  labels,
-  selected,
-  onSelect,
-  onOpen,
-}: Props) {
+export function CardItem({ boardId, columnId, card, labels, selected, onSelect, onOpen }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
   const [edge, setEdge] = useState<Edge | null>(null);
@@ -186,8 +178,6 @@ export function CardItem({
 
 function DropLine({ position }: { position: string }) {
   return (
-    <div
-      className={cn("absolute inset-x-1 z-10 h-0.5 rounded-full bg-accent-light", position)}
-    />
+    <div className={cn("absolute inset-x-1 z-10 h-0.5 rounded-full bg-accent-light", position)} />
   );
 }

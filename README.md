@@ -57,9 +57,14 @@ bun run dev
 Open [http://localhost:3000](http://localhost:3000).
 
 ```bash
-bun run build   # production build
-bun run lint    # eslint
+bun run build       # production build
+bun run lint        # eslint
+bun run typecheck   # route types + tsc
+bun run format      # prettier
 ```
+
+`bun install` also sets up git hooks that lint and format staged files, check
+commit messages and type-check before pushing.
 
 ## Tech
 
@@ -90,6 +95,13 @@ boards to a backend later does not touch the UI. See
 - [ ] Mindmaps
 - [ ] Roadmap / timeline view
 - [ ] Sync across devices
+
+## Contributing
+
+Pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first:
+commits follow Conventional Commits, every merged PR bumps the version, and
+`master` only accepts squash-merged PRs that pass CI. Report security issues
+privately as described in [SECURITY.md](SECURITY.md).
 
 ## License
 

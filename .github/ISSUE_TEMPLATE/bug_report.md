@@ -6,13 +6,12 @@ labels: bug
 
 **What happened?**
 
-**Steps to reproduce**
-1.
-2.
+**Steps to reproduce** 1. 2.
 
 **Expected behavior**
 
 **Environment**
+
 - Browser + version:
 - OS:
 - Deployed site or local build?

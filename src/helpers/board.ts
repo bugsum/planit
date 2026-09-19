@@ -1,13 +1,6 @@
 import { newId } from "@/helpers/id";
 import { TEMPLATES, type BoardTemplate } from "@/helpers/templates";
-import type {
-  Board,
-  BoardFilters,
-  Card,
-  Column,
-  LabelColor,
-  Priority,
-} from "@/types/kanban";
+import type { Board, BoardFilters, Card, Column, LabelColor, Priority } from "@/types/kanban";
 
 export const LABEL_COLORS: LabelColor[] = [
   "slate",
@@ -117,9 +110,7 @@ export function matchesFilters(card: Card, filters: BoardFilters) {
 
 export function isFilterActive(filters: BoardFilters) {
   return (
-    filters.query.trim().length > 0 ||
-    filters.labelIds.length > 0 ||
-    filters.priority !== "all"
+    filters.query.trim().length > 0 || filters.labelIds.length > 0 || filters.priority !== "all"
   );
 }
 

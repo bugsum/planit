@@ -193,6 +193,19 @@ previews the result and passes it to `addCard(..., extras)`.
 `helpers/templates.ts` defines board templates (columns, WIP limits, labels).
 `createBoard(name, templateId)` builds from one; Classic is the default.
 
+## Tooling and repository rules
+
+- Prettier (`.prettierrc.json`, Tailwind class sorting) and ESLint
+  (`eslint.config.mjs`: Next rules plus project rules such as no `any` and
+  `localStorage` only in `helpers/storage.ts`).
+- Husky hooks: lint-staged on commit, commitlint on the message, type check on
+  push. `bun run typecheck` runs `next typegen` first so route types exist.
+- `scripts/` holds repo tooling run by Bun: `bump-version.ts` (version and
+  changelog) and `check-pr.ts` (the PR gate used by CI).
+- `.github/workflows`: CI (quality), PR checks, release on merge, stale bot.
+  Branch protection lives in `.github/rulesets/master.json` and is applied by
+  hand; see [repository-settings.md](repository-settings.md).
+
 ## Import / export (`src/helpers/transfer.ts`)
 
 Boards export as `{ app, kind, version, board }` JSON. Import validates and

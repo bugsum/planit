@@ -68,8 +68,7 @@ export function shortcutsIn(group: ShortcutGroup): Shortcut[] {
 
 export function isMac() {
   if (typeof navigator === "undefined") return false;
-  const data = (navigator as Navigator & { userAgentData?: { platform?: string } })
-    .userAgentData;
+  const data = (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData;
   return /mac|iphone|ipad/i.test(data?.platform || navigator.userAgent);
 }
 

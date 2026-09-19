@@ -18,9 +18,7 @@ export function Select({ className, ...props }: ComponentProps<"select">) {
 
 export function FieldLabel({ children }: { children: ReactNode }) {
   return (
-    <span className="text-[11px] font-bold tracking-wider text-zinc-500 uppercase">
-      {children}
-    </span>
+    <span className="text-[11px] font-bold tracking-wider text-zinc-500 uppercase">{children}</span>
   );
 }
 

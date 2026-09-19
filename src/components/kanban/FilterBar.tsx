@@ -5,12 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Input, Select } from "@/components/ui/Field";
 import { SearchIcon } from "@/components/ui/Icons";
 import { Kbd } from "@/components/ui/Kbd";
-import {
-  LABEL_DOT_CLASSES,
-  PRIORITIES,
-  PRIORITY_LABELS,
-  isFilterActive,
-} from "@/helpers/board";
+import { LABEL_DOT_CLASSES, PRIORITIES, PRIORITY_LABELS, isFilterActive } from "@/helpers/board";
 import { cn } from "@/helpers/cn";
 import type { BoardFilters, Label, Priority } from "@/types/kanban";
 

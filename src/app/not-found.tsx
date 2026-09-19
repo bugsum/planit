@@ -17,8 +17,8 @@ export default function NotFound() {
         Nothing planned here.
       </h1>
       <p className="mt-4 text-[15px] text-zinc-400">
-        This page doesn&apos;t exist. If you followed a link to a board, it lives in the browser
-        it was created in.
+        This page doesn&apos;t exist. If you followed a link to a board, it lives in the browser it
+        was created in.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-2">
         <Link href="/kanban" className={buttonClasses({ variant: "primary" })}>

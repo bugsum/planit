@@ -59,8 +59,20 @@ function PaletteBody({ onDone }: { onDone: () => void }) {
   const baseCommands = useMemo(() => {
     const go = (href: string) => () => router.push(href);
     const global: Command[] = [
-      { id: "nav:home", title: "Go to home", group: "Navigation", keywords: "landing start", run: go("/") },
-      { id: "nav:boards", title: "Go to boards", group: "Navigation", keywords: "kanban list", run: go("/kanban") },
+      {
+        id: "nav:home",
+        title: "Go to home",
+        group: "Navigation",
+        keywords: "landing start",
+        run: go("/"),
+      },
+      {
+        id: "nav:boards",
+        title: "Go to boards",
+        group: "Navigation",
+        keywords: "kanban list",
+        run: go("/kanban"),
+      },
       {
         id: "board:new",
         title: "New board",
@@ -194,15 +206,19 @@ function PaletteBody({ onDone }: { onDone: () => void }) {
         <Kbd>Esc</Kbd>
       </div>
 
-      <div ref={listRef} role="listbox" aria-label="Results" className="flex-1 overflow-y-auto p-1.5">
+      <div
+        ref={listRef}
+        role="listbox"
+        aria-label="Results"
+        className="flex-1 overflow-y-auto p-1.5"
+      >
         {results.length === 0 ? (
           <p className="px-3 py-10 text-center text-sm text-zinc-500">
             Nothing matches “{trimmed}”.
           </p>
         ) : (
           results.map((command, index) => {
-            const header =
-              !trimmed && (index === 0 || results[index - 1].group !== command.group);
+            const header = !trimmed && (index === 0 || results[index - 1].group !== command.group);
             return (
               <div key={command.id}>
                 {header ? (

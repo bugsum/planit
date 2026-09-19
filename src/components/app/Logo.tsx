@@ -18,7 +18,9 @@ export function LogoMark({ size = 22, ...props }: SVGProps<SVGSVGElement> & { si
 
 export function Logo({ size = 22, className }: { size?: number; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5 font-extrabold tracking-tight", className)}>
+    <span
+      className={cn("inline-flex items-center gap-2.5 font-extrabold tracking-tight", className)}
+    >
       <LogoMark size={size} />
       {SITE.name}
     </span>

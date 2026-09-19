@@ -1,13 +1,6 @@
 export type Priority = "none" | "low" | "medium" | "high" | "urgent";
 
-export type LabelColor =
-  | "slate"
-  | "red"
-  | "amber"
-  | "green"
-  | "sky"
-  | "indigo"
-  | "pink";
+export type LabelColor = "slate" | "red" | "amber" | "green" | "sky" | "indigo" | "pink";
 
 export type Label = {
   id: string;
