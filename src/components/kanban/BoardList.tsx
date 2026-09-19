@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import { boardListMenu, boardTileMenu } from "@/components/kanban/menus";
 import { Button } from "@/components/ui/Button";
 import { MenuButton, openContextMenu } from "@/components/ui/ContextMenu";
-import { Input } from "@/components/ui/Field";
+import { Field, Input } from "@/components/ui/Field";
 import { PlusIcon, UploadIcon } from "@/components/ui/Icons";
 import { Combo, Kbd } from "@/components/ui/Kbd";
 import { Modal } from "@/components/ui/Modal";
@@ -15,6 +15,7 @@ import { cn } from "@/helpers/cn";
 import { commandsFromMenu } from "@/helpers/menu";
 import { SHORTCUTS } from "@/helpers/shortcuts";
 import { requestPersistentStorage } from "@/helpers/storage";
+import { TEMPLATES } from "@/helpers/templates";
 import { parseBoardFile } from "@/helpers/transfer";
 import { useHotkeys } from "@/helpers/use-hotkeys";
 import { useHydrated } from "@/helpers/use-hydrated";
@@ -35,10 +36,12 @@ export function BoardList() {
   const createOpen = creating || pendingNewBoard;
   const [renaming, setRenaming] = useState<string | null>(null);
   const [name, setName] = useState("");
+  const [templateId, setTemplateId] = useState(TEMPLATES[0].id);
   const [error, setError] = useState("");
 
   function startCreate() {
     setName("");
+    setTemplateId(TEMPLATES[0].id);
     setCreating(true);
   }
 
@@ -58,7 +61,7 @@ export function BoardList() {
 
   function create() {
     requestPersistentStorage();
-    const id = actions.createBoard(name);
+    const id = actions.createBoard(name, templateId);
     closeCreate();
     router.push(`/kanban/${id}`);
   }
@@ -185,6 +188,7 @@ export function BoardList() {
         open={createOpen}
         onClose={closeCreate}
         title="New board"
+        size="lg"
         footer={
           <>
             <Button variant="ghost" onClick={closeCreate}>
@@ -196,15 +200,58 @@ export function BoardList() {
           </>
         }
       >
-        <Input
-          autoFocus
-          placeholder="e.g. Portfolio relaunch"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") create();
-          }}
-        />
+        <div className="space-y-5">
+          <Field label="Name">
+            <Input
+              autoFocus
+              placeholder="e.g. Portfolio relaunch"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") create();
+              }}
+            />
+          </Field>
+
+          <fieldset>
+            <legend className="text-[11px] font-bold tracking-wider text-zinc-500 uppercase">
+              Template
+            </legend>
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+              {TEMPLATES.map((template) => (
+                <label key={template.id} className="block cursor-pointer">
+                  <input
+                    type="radio"
+                    name="template"
+                    value={template.id}
+                    checked={templateId === template.id}
+                    onChange={() => setTemplateId(template.id)}
+                    className="peer sr-only"
+                  />
+                  <span className="block h-full rounded-xl border border-line bg-canvas/40 p-3.5 transition-colors peer-checked:border-accent-light peer-checked:bg-accent/[0.08] peer-focus-visible:ring-2 peer-focus-visible:ring-accent-light hover:border-line-strong">
+                    <span className="block text-sm font-extrabold tracking-tight">
+                      {template.name}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-zinc-400">
+                      {template.description}
+                    </span>
+                    <span className="mt-2.5 flex flex-wrap gap-1">
+                      {template.columns.map((column) => (
+                        <span
+                          key={column.title}
+                          className="rounded-md bg-white/[0.05] px-1.5 py-0.5 text-[10px] font-semibold text-zinc-400"
+                        >
+                          {column.title}
+                          {column.wipLimit ? ` · ${column.wipLimit}` : ""}
+                        </span>
+                      ))}
+                    </span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        </div>
       </Modal>
 
       <Modal

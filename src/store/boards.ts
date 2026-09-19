@@ -13,6 +13,7 @@ import {
 } from "@/helpers/board";
 import { newId } from "@/helpers/id";
 import { planitStorage, subscribeToExternalChanges } from "@/helpers/storage";
+import { findTemplate } from "@/helpers/templates";
 import type { Board, Card, ChecklistItem, Label, LabelColor } from "@/types/kanban";
 
 const STORAGE_KEY = "planit.kanban.v1";
@@ -30,7 +31,7 @@ type BoardsState = {
   boards: Record<string, Board>;
   boardOrder: string[];
   history: Record<string, History>;
-  createBoard: (name: string) => string;
+  createBoard: (name: string, templateId?: string) => string;
   renameBoard: (boardId: string, name: string) => void;
   deleteBoard: (boardId: string) => void;
   duplicateBoard: (boardId: string) => string | null;
@@ -40,7 +41,12 @@ type BoardsState = {
   deleteColumn: (boardId: string, columnId: string) => void;
   moveColumn: (boardId: string, columnId: string, toIndex: number) => void;
   setWipLimit: (boardId: string, columnId: string, limit: number | null) => void;
-  addCard: (boardId: string, columnId: string, title: string) => string;
+  addCard: (
+    boardId: string,
+    columnId: string,
+    title: string,
+    extras?: Partial<Pick<Card, "labelIds" | "priority" | "dueDate">>,
+  ) => string;
   updateCard: (boardId: string, cardId: string, patch: Partial<Card>) => void;
   duplicateCard: (boardId: string, cardId: string) => string | null;
   deleteCard: (boardId: string, cardId: string) => void;
@@ -118,7 +124,8 @@ export const useBoardsStore = create<BoardsState>()(
         boardOrder: [],
         history: {},
 
-        createBoard: (name) => addBoard(buildBoard(name.trim() || "Untitled board")),
+        createBoard: (name, templateId) =>
+          addBoard(buildBoard(name.trim() || "Untitled board", findTemplate(templateId))),
 
         renameBoard: (boardId, name) =>
           edit(boardId, (board) => {
@@ -181,8 +188,8 @@ export const useBoardsStore = create<BoardsState>()(
             column.wipLimit = next;
           }),
 
-        addCard: (boardId, columnId, title) => {
-          const card = createCard(title.trim());
+        addCard: (boardId, columnId, title, extras) => {
+          const card = { ...createCard(title.trim()), ...extras };
           edit(boardId, (board) => {
             const column = board.columns.find((c) => c.id === columnId);
             if (!column) return false;

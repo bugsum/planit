@@ -182,6 +182,7 @@ export function ColumnView({
         <AddCardForm
           boardId={boardId}
           columnId={column.id}
+          labels={labels}
           open={composerOpen}
           onOpenChange={onComposerChange}
         />

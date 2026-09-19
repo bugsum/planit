@@ -1,10 +1,10 @@
 import { newId } from "@/helpers/id";
+import { TEMPLATES, type BoardTemplate } from "@/helpers/templates";
 import type {
   Board,
   BoardFilters,
   Card,
   Column,
-  Label,
   LabelColor,
   Priority,
 } from "@/types/kanban";
@@ -58,14 +58,6 @@ export const PRIORITY_CLASSES: Record<Priority, string> = {
   urgent: "bg-red-500/15 text-red-300 border-red-500/30",
 };
 
-const DEFAULT_COLUMNS = ["Backlog", "To Do", "In Progress", "Done"];
-
-const DEFAULT_LABELS: Array<Pick<Label, "name" | "color">> = [
-  { name: "Feature", color: "indigo" },
-  { name: "Bug", color: "red" },
-  { name: "Idea", color: "amber" },
-];
-
 export function createColumn(title: string): Column {
   return { id: newId("col"), title, cardIds: [], wipLimit: null };
 }
@@ -85,14 +77,17 @@ export function createCard(title: string): Card {
   };
 }
 
-export function createBoard(name: string): Board {
+export function createBoard(name: string, template: BoardTemplate = TEMPLATES[0]): Board {
   const now = new Date().toISOString();
   return {
     id: newId("board"),
     name,
-    columns: DEFAULT_COLUMNS.map(createColumn),
+    columns: template.columns.map(({ title, wipLimit }) => ({
+      ...createColumn(title),
+      wipLimit: wipLimit ?? null,
+    })),
     cards: {},
-    labels: DEFAULT_LABELS.map((label) => ({ ...label, id: newId("label") })),
+    labels: template.labels.map((label) => ({ ...label, id: newId("label") })),
     createdAt: now,
     updatedAt: now,
   };
@@ -129,7 +124,9 @@ export function isFilterActive(filters: BoardFilters) {
 }
 
 export function formatDate(value: string) {
-  return new Date(value).toLocaleDateString(undefined, {
+  // Date-only strings parse as UTC midnight; read them as local days so they don't shift a day west of UTC.
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T00:00:00`) : new Date(value);
+  return date.toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
     year: "numeric",
