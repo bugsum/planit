@@ -3,6 +3,19 @@
 Run `bun run dev` and work through this. Every item is unchecked after the
 UI refresh; tick them as you go.
 
+## Branding
+
+- [ ] Browser tab shows the blue "P" favicon (Chrome/Edge/Firefox use the SVG,
+      older browsers the .ico)
+- [ ] Top bar and homepage footer show the logo mark next to "Plan It"
+- [ ] Accent color is the brand blue across buttons, selection rings and links;
+      small accent text stays readable on the dark background
+- [ ] iOS "Add to Home Screen" uses the Apple icon and the name "Plan It"
+- [ ] Chrome "Install app": name "Plan It", dark splash, blue icon
+- [ ] `/manifest.webmanifest` lists the 192 and 512 icons
+- [ ] Mobile browser UI (address bar) is tinted to the dark canvas color
+- [ ] README on GitHub shows the logo above the title
+
 ## Homepage
 
 - [ ] Hero, principles, features, keyboard, planners, how-it-works and closing

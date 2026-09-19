@@ -1,6 +1,13 @@
-# Plan It
+<p align="center">
+  <img src="public/logo.svg" width="80" height="80" alt="Plan It logo" />
+</p>
 
-Planning tools for the part of a project that happens before the first commit.
+<h1 align="center">Plan It</h1>
+
+<p align="center">
+  <strong>Think it through. Then build it.</strong><br />
+  Planning tools for the part of a project that happens before the first commit.
+</p>
 
 Most planning apps are built around executing work. Plan It is built around
 shaping it — the backlog you rewrite three times, the ideas that are not tasks

@@ -237,7 +237,7 @@ export function BoardView({ boardId }: { boardId: string }) {
         </p>
         <Link
           href="/kanban"
-          className="mt-6 inline-block text-sm font-semibold text-accent hover:text-accent-hover"
+          className="mt-6 inline-block text-sm font-semibold text-accent-light hover:text-white"
         >
           ← Back to boards
         </Link>

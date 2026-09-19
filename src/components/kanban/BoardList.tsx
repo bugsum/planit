@@ -80,7 +80,7 @@ export function BoardList() {
     >
       <div className="flex flex-wrap items-end justify-between gap-6">
         <div>
-          <p className="text-xs font-bold tracking-[0.2em] text-accent uppercase">Kanban</p>
+          <p className="text-xs font-bold tracking-[0.2em] text-accent-light uppercase">Kanban</p>
           <h1 className="mt-2 text-4xl font-extrabold tracking-tight sm:text-5xl">Your boards</h1>
           <p className="mt-3 max-w-md text-[15px] text-zinc-400">
             Saved in this browser. Right-click anywhere for actions, or press{" "}

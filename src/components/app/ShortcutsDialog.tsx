@@ -20,7 +20,7 @@ export function ShortcutsDialog() {
       <div className="mt-6 grid gap-x-10 gap-y-8 md:grid-cols-2">
         {SHORTCUT_GROUPS.map((group) => (
           <section key={group}>
-            <h3 className="text-[11px] font-bold tracking-wider text-accent uppercase">
+            <h3 className="text-[11px] font-bold tracking-wider text-accent-light uppercase">
               {group}
             </h3>
             <ul className="mt-2 divide-y divide-line">

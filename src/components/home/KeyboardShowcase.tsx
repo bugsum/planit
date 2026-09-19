@@ -18,7 +18,7 @@ export function KeyboardShowcase() {
     <section className="relative overflow-hidden border-y border-line bg-surface/40">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-1/2 -right-40 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-fuchsia-500/10 blur-[110px]"
+        className="pointer-events-none absolute top-1/2 -right-40 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-sky-400/10 blur-[110px]"
       />
       <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-4 py-24 sm:px-6 sm:py-32 lg:grid-cols-2">
         <div>
@@ -26,7 +26,7 @@ export function KeyboardShowcase() {
             eyebrow="Keyboard-first"
             title={
               <>
-                Your hands never <span className="text-accent">leave the keyboard.</span>
+                Your hands never <span className="text-accent-light">leave the keyboard.</span>
               </>
             }
           >

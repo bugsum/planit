@@ -45,7 +45,7 @@ export function Planners() {
         eyebrow="Planners"
         title={
           <>
-            One workspace. <span className="text-accent">Every way you plan.</span>
+            One workspace. <span className="text-accent-light">Every way you plan.</span>
           </>
         }
       >
@@ -97,7 +97,7 @@ function PlannerCard({ planner }: { planner: Planner }) {
         ))}
       </ul>
       {live ? (
-        <span className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-accent transition-colors group-hover:text-accent-hover">
+        <span className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-accent-light transition-colors group-hover:text-white">
           Open {planner.name}
           <ArrowRightIcon width={14} height={14} />
         </span>

@@ -133,7 +133,7 @@ function MockCardView({ card }: { card: MockCard }) {
     <div
       className={cn(
         "relative overflow-hidden rounded-lg border bg-raised px-2.5 py-2",
-        card.selected ? "border-accent ring-3 ring-accent/25" : "border-line",
+        card.selected ? "border-accent-light ring-3 ring-accent/30" : "border-line",
       )}
     >
       {card.priority === "urgent" || card.priority === "high" ? (

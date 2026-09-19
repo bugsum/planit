@@ -19,7 +19,7 @@ export function Principles() {
       <div className="mx-auto grid max-w-7xl gap-px bg-line sm:grid-cols-3">
         {PRINCIPLES.map((principle, index) => (
           <div key={principle.title} className="bg-canvas px-6 py-12 sm:px-8 sm:py-14">
-            <p className="font-mono text-xs font-bold text-accent">0{index + 1}</p>
+            <p className="font-mono text-xs font-bold text-accent-light">0{index + 1}</p>
             <h3 className="mt-4 text-3xl font-extrabold tracking-tight">{principle.title}</h3>
             <p className="mt-3 leading-relaxed text-zinc-400">{principle.body}</p>
           </div>

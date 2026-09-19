@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { Logo } from "@/components/app/Logo";
 import { SectionHeading } from "@/components/home/SectionHeading";
 import { buttonClasses } from "@/components/ui/Button";
-import { ArrowRightIcon, GithubIcon, LogoMark } from "@/components/ui/Icons";
+import { ArrowRightIcon, GithubIcon } from "@/components/ui/Icons";
 import { SITE } from "@/helpers/site";
 
 const STEPS = [
@@ -29,7 +30,7 @@ export function Closing() {
             align="center"
             title={
               <>
-                From idea to plan <span className="text-accent">in three moves.</span>
+                From idea to plan <span className="text-accent-light">in three moves.</span>
               </>
             }
           />
@@ -54,7 +55,7 @@ export function Closing() {
         />
         <div className="relative mx-auto max-w-4xl px-4 py-28 text-center sm:px-6 sm:py-36">
           <h2 className="text-4xl font-black tracking-tighter text-balance sm:text-6xl">
-            Your next project deserves <span className="text-accent">a plan.</span>
+            Your next project deserves <span className="text-accent-light">a plan.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-lg text-zinc-400">
             Free, open source, and yours. Open a board and start shaping the work in seconds.
@@ -71,10 +72,7 @@ export function Closing() {
 
       <footer className="border-t border-line">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-8 text-sm text-zinc-500 sm:px-6">
-          <span className="flex items-center gap-2.5 font-extrabold tracking-tight text-zinc-300">
-            <LogoMark width={18} height={18} />
-            {SITE.name}
-          </span>
+          <Logo size={18} className="text-zinc-300" />
           <span>MIT licensed · Built for people who plan first</span>
           <a
             href={SITE.repo}
