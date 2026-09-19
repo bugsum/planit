@@ -38,7 +38,7 @@ export function Hero() {
 
           <h1 className="mt-8 animate-fade-up text-5xl leading-[0.95] font-black tracking-tighter [animation-delay:80ms] sm:text-7xl lg:text-8xl">
             Think it through.
-            <span className="block bg-linear-to-r from-accent via-fuchsia-400 to-amber-300 bg-clip-text pb-2 text-transparent">
+            <span className="block bg-linear-to-r from-accent-light via-sky-300 to-white bg-clip-text pb-2 text-transparent">
               Then build it.
             </span>
           </h1>
@@ -69,7 +69,7 @@ export function Hero() {
           <ul className="mt-8 flex animate-fade-up flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] font-semibold text-zinc-500 [animation-delay:320ms]">
             {PROMISES.map((promise) => (
               <li key={promise} className="inline-flex items-center gap-1.5">
-                <CheckIcon width={14} height={14} className="text-accent" />
+                <CheckIcon width={14} height={14} className="text-accent-light" />
                 {promise}
               </li>
             ))}

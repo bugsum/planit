@@ -104,7 +104,7 @@ export function CardItem({
         className={cn(
           "group relative cursor-pointer overflow-hidden rounded-lg border bg-raised px-3 py-2.5 shadow-sm shadow-black/30 transition-[border-color,box-shadow,opacity]",
           selected
-            ? "border-accent ring-3 ring-accent/25"
+            ? "border-accent-light ring-3 ring-accent/30"
             : "border-line hover:border-line-strong",
           dragging && "opacity-40",
         )}
@@ -163,7 +163,7 @@ export function CardItem({
 function DropLine({ position }: { position: string }) {
   return (
     <div
-      className={cn("absolute inset-x-1 z-10 h-0.5 rounded-full bg-accent", position)}
+      className={cn("absolute inset-x-1 z-10 h-0.5 rounded-full bg-accent-light", position)}
     />
   );
 }

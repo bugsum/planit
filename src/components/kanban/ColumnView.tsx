@@ -233,6 +233,6 @@ export function ColumnView({
 
 function DropLine({ position }: { position: string }) {
   return (
-    <div className={cn("absolute inset-y-2 z-10 w-0.5 rounded-full bg-accent", position)} />
+    <div className={cn("absolute inset-y-2 z-10 w-0.5 rounded-full bg-accent-light", position)} />
   );
 }

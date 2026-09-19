@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Logo } from "@/components/app/Logo";
 import { iconButtonClasses } from "@/components/ui/Button";
-import { GithubIcon, KeyboardIcon, LogoMark } from "@/components/ui/Icons";
+import { GithubIcon, KeyboardIcon } from "@/components/ui/Icons";
 import { Kbd } from "@/components/ui/Kbd";
 import { cn } from "@/helpers/cn";
 import { SITE } from "@/helpers/site";
@@ -18,12 +19,8 @@ export function TopBar() {
     <header className="sticky top-0 z-40 h-14 shrink-0 border-b border-line bg-canvas/80 backdrop-blur-md">
       <div className="mx-auto flex h-full w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <div className="flex items-center gap-5">
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 text-[15px] font-extrabold tracking-tight"
-          >
-            <LogoMark />
-            {SITE.name}
+          <Link href="/" aria-label={`${SITE.name} home`}>
+            <Logo className="text-[15px]" />
           </Link>
           <nav className="flex items-center gap-1">
             {NAV.map((item) => {

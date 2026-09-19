@@ -67,7 +67,7 @@ export function Features() {
         eyebrow="Kanban"
         title={
           <>
-            A board that bends <span className="text-accent">to your process.</span>
+            A board that bends <span className="text-accent-light">to your process.</span>
           </>
         }
       >
@@ -81,7 +81,7 @@ export function Features() {
             key={title}
             className="rounded-2xl border border-line bg-surface p-6 transition-colors hover:border-line-strong"
           >
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent/12 text-accent">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent/12 text-accent-light">
               <Icon width={18} height={18} />
             </span>
             <h3 className="mt-5 text-lg font-extrabold tracking-tight">{title}</h3>

@@ -210,14 +210,3 @@ export function GithubIcon(props: IconProps) {
     </svg>
   );
 }
-
-export function LogoMark(props: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" width={22} height={22} aria-hidden="true" {...props}>
-      <rect width="24" height="24" rx="6" fill="var(--color-accent)" />
-      <rect x="5.5" y="6" width="3.2" height="12" rx="1.2" fill="white" />
-      <rect x="10.4" y="6" width="3.2" height="8" rx="1.2" fill="white" fillOpacity="0.8" />
-      <rect x="15.3" y="6" width="3.2" height="5" rx="1.2" fill="white" fillOpacity="0.6" />
-    </svg>
-  );
-}

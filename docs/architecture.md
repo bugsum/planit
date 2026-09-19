@@ -110,12 +110,28 @@ react-beautiful-dnd). Drag payloads and type guards live in `src/helpers/dnd.ts`
 Pragmatic ships no keyboard dragging; the keyboard moves above and the card and
 column menus cover that.
 
-## Styling
+## Styling and branding
 
 Tailwind v4 with design tokens in `src/app/globals.css` (`canvas`, `surface`,
-`raised`, `line`, `line-strong`, `accent`). Global element styles sit in
-`@layer base` so utilities can override them. Animations respect
-`prefers-reduced-motion`.
+`raised`, `line`, `line-strong`, `accent`, `accent-hover`, `accent-light`).
+Global element styles sit in `@layer base` so utilities can override them.
+Animations respect `prefers-reduced-motion`.
+
+`accent` is the brand blue `#0A4BFE`, used for fills (white text on it passes
+AA). On the dark canvas it is too dark for small text, so text, focus outlines
+and selection rings use `accent-light` instead.
+
+Name, tagline, colors and repo URL live in `src/helpers/site.ts`. The logo is a
+vector in `components/app/Logo.tsx`, mirrored by `src/app/icon.svg`.
+
+Icons use Next's file conventions, which generate the `<head>` tags:
+
+- `src/app/favicon.ico` (16/32/48) for legacy browsers
+- `src/app/icon.svg` for modern browsers
+- `src/app/apple-icon.png` (180px) for iOS
+- `src/app/manifest.ts` pointing at `public/icon-192.png` and `public/icon-512.png`
+
+The PNGs are rendered from the SVG so every size matches.
 
 The homepage is fully static server components; the only client code it ships
 is the platform-aware key chips and the app-wide overlays.
