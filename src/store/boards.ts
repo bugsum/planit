@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
@@ -11,9 +12,10 @@ import {
   moveInArray,
 } from "@/helpers/board";
 import { newId } from "@/helpers/id";
-import { planitStorage } from "@/helpers/storage";
+import { planitStorage, subscribeToExternalChanges } from "@/helpers/storage";
 import type { Board, Card, Label, LabelColor } from "@/types/kanban";
 
+const STORAGE_KEY = "planit.kanban.v1";
 const HISTORY_LIMIT = 100;
 const COALESCE_MS = 1000;
 
@@ -288,7 +290,7 @@ export const useBoardsStore = create<BoardsState>()(
       };
     }),
     {
-      name: "planit.kanban.v1",
+      name: STORAGE_KEY,
       version: 1,
       storage: createJSONStorage(() => planitStorage),
       skipHydration: true,
@@ -353,6 +355,23 @@ export function useUndoState(boardId: string) {
       canUndo: (state.history[boardId]?.past.length ?? 0) > 0,
       canRedo: (state.history[boardId]?.future.length ?? 0) > 0,
     })),
+  );
+}
+
+/**
+ * Reloads boards when another tab saves, so two tabs never silently overwrite
+ * each other. Undo history is dropped: its snapshots predate the other tab's
+ * edits, and undoing would quietly revert them.
+ */
+export function useBoardsSync() {
+  useEffect(
+    () =>
+      subscribeToExternalChanges(STORAGE_KEY, () => {
+        void Promise.resolve(useBoardsStore.persist.rehydrate()).then(() =>
+          useBoardsStore.setState({ history: {} }),
+        );
+      }),
+    [],
   );
 }
 

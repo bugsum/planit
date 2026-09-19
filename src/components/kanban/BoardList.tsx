@@ -13,6 +13,7 @@ import { Modal } from "@/components/ui/Modal";
 import { LABEL_DOT_CLASSES, countCards, findLabel, formatRelative } from "@/helpers/board";
 import { cn } from "@/helpers/cn";
 import { SHORTCUTS } from "@/helpers/shortcuts";
+import { requestPersistentStorage } from "@/helpers/storage";
 import { parseBoardFile } from "@/helpers/transfer";
 import { useHotkeys } from "@/helpers/use-hotkeys";
 import { useHydrated } from "@/helpers/use-hydrated";
@@ -46,6 +47,7 @@ export function BoardList() {
   }
 
   function create() {
+    requestPersistentStorage();
     const id = actions.createBoard(name);
     setCreating(false);
     router.push(`/kanban/${id}`);
@@ -63,6 +65,7 @@ export function BoardList() {
       return;
     }
     setError("");
+    requestPersistentStorage();
     router.push(`/kanban/${actions.importBoard(result.board)}`);
   }
 
