@@ -4,6 +4,12 @@ All notable changes are documented here. Format based on [Keep a Changelog](http
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-19
+
+### Changed
+
+- Updated React and React DOM to 19.3.0
+
 ## [0.2.0] - 2026-09-19
 
 ### Added
@@ -40,6 +46,7 @@ All notable changes are documented here. Format based on [Keep a Changelog](http
 - JSON export/import with local browser storage
 - Branding and homepage
 
-[Unreleased]: https://github.com/bugsum/planit/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/bugsum/planit/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/bugsum/planit/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/bugsum/planit/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/bugsum/planit/releases/tag/v0.1.0
