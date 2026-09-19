@@ -52,8 +52,26 @@ menus read the latest board with `getBoard(id)`.
 
 ## UI state (`src/store/ui.ts`)
 
-App chrome state that is not data: the open context menu and whether the
-shortcut guide is open. Plain zustand, not persisted.
+App chrome state that is not data: the open context menu, whether the shortcut
+guide and command palette are open, and the page's palette contributions. Plain
+zustand, not persisted.
+
+## Command palette (`src/components/app/CommandPalette.tsx`)
+
+`Ctrl/⌘ + K` (a hotkey with `inFields`, so it works while typing). Commands
+come from three places:
+
+- Global: navigation, new board, shortcut guide.
+- The current page, via `useRegisterCommands(build)`. The builder runs when the
+  palette opens. Board and boards-list pages convert their menu builders with
+  `commandsFromMenu`, so the palette, right-click and ⋮ menus never drift apart.
+  Page commands win over global ones with the same title.
+- Data: every board, and every card across boards.
+
+`helpers/fuzzy.ts` ranks matches. Picking a card on the open board calls the
+opener registered with `useRegisterCardOpener`; on another board it navigates to
+`/kanban/<id>?card=<cardId>`, which seeds `BoardView` state once and is stripped.
+`BoardView` is keyed by board id so switching boards resets its local state.
 
 ## Keyboard (`src/helpers/shortcuts.ts`, `src/helpers/use-hotkeys.ts`)
 
@@ -88,7 +106,19 @@ the browser's native menu.
 
 `planitStorage` is the only place that touches `localStorage`. It implements
 zustand's `StateStorage` interface, so swapping in an API-backed driver later
-means rewriting three methods — no component or store changes.
+means rewriting this file — no component or store changes. The file also owns:
+
+- `subscribeToExternalChanges(key, cb)`: the `storage` event today, a socket or
+  BroadcastChannel later. `useBoardsSync()` uses it to rehydrate when another tab
+  saves, and clears undo history so undo can't revert the other tab's edits.
+- `onSaveError(cb)`: failed writes (quota, blocked storage) notify
+  `SaveErrorBanner` instead of failing silently.
+- `requestPersistentStorage()`: asks the browser not to evict data. Called from
+  create/import so Firefox's prompt never appears on load.
+
+The stored schema is versioned. v2 added `Card.checklist`; `migrate` backfills
+empty checklists, and `transfer.ts` repairs them on import (export format v2,
+v1 files still import).
 
 The store uses `skipHydration`, and `useHydrated()` kicks off the read on mount.
 That keeps server markup and the first client render identical; pages show a
@@ -153,6 +183,15 @@ canonical, Open Graph and sitemap URL is absolute.
   `baseOpenGraph` and add `socialImage`.
 - The homepage renders JSON-LD (WebSite, Organization with the logo,
   SoftwareApplication) through `jsonLdScript`, which escapes `<`.
+
+## Quick-add and templates
+
+`helpers/quick-add.ts` is a pure parser: `#label` (existing labels only, spaces
+ignored), `!priority`, `@date`. Only resolved tokens are consumed. `AddCardForm`
+previews the result and passes it to `addCard(..., extras)`.
+
+`helpers/templates.ts` defines board templates (columns, WIP limits, labels).
+`createBoard(name, templateId)` builds from one; Classic is the default.
 
 ## Import / export (`src/helpers/transfer.ts`)
 

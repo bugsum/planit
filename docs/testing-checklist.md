@@ -31,6 +31,71 @@ Run these against the deployed site (https://planit.iamsamarth.xyz).
 - [ ] Google Rich Results Test parses the JSON-LD without errors
 - [ ] Submit the sitemap in Google Search Console
 
+## Reliability
+
+- [ ] Open the same board in two tabs; edit in one, switch to the other — it
+      shows the change within a moment, and nothing gets overwritten
+- [ ] After a change arrives from the other tab, undo/redo start fresh
+- [ ] Storage full: DevTools → Application → Storage → "Simulate custom storage
+      quota" at ~1 KB, then edit a card — the red "Couldn't save" banner appears
+      and can be dismissed
+- [ ] Creating or importing a board asks for persistent storage (Firefox shows a
+      prompt once; Chrome grants silently — check `await navigator.storage.persisted()`)
+- [ ] `/does-not-exist` shows the branded 404 with links to boards and home
+- [ ] Error page: throw inside a component temporarily — "Something broke" with
+      a working Try again
+
+## Command palette
+
+- [ ] `Ctrl/⌘ + K` opens it from any page, including while typing in a field
+- [ ] Top bar search button opens it; shows `⌘K` / `Ctrl+K`
+- [ ] Empty query on a board: "This board" commands first, then navigation,
+      general and the five most recent boards
+- [ ] On `/kanban`: "Boards list" commands, and "New board" opens the template modal
+- [ ] "New board" from the homepage lands on `/kanban` with the modal open
+- [ ] Typing fuzzy-matches (e.g. "nwcol" finds "New column"); card titles from
+      every board appear with "Board · Column" underneath
+- [ ] Picking a card on the current board opens it in place
+- [ ] Picking a card on another board navigates there and opens it; the URL
+      ends up without `?card=`
+- [ ] ↑/↓ wrap, Enter runs, Esc and clicking the backdrop close
+- [ ] Disabled actions (e.g. Undo with no history) don't appear
+- [ ] Switching boards via the palette starts with no filters or open card
+
+## Checklists and notes
+
+- [ ] Add item, type, Enter adds the next one below and focuses it
+- [ ] Backspace on an empty item removes it and focuses the neighbour
+- [ ] Alt + ↑/↓ reorders and keeps focus
+- [ ] Leaving an item empty (click away) removes it
+- [ ] Progress bar and card badge show done/total; both turn green at 100%
+- [ ] Undo reverses a check, a rename (as one step), an add and a delete
+- [ ] Duplicating a card copies its checklist
+- [ ] Description renders markdown: headings, lists, `**bold**`, code, tables,
+      task lists, links (open in a new tab)
+- [ ] `<script>alert(1)</script>` in a description shows as text, never runs
+- [ ] Click the preview (not a link) to edit; first Esc returns to preview,
+      second Esc closes the dialog
+- [ ] Cards with notes show the small lines icon
+- [ ] Boards saved before this update load fine and gain empty checklists
+- [ ] Exported JSON includes checklists; a v1 export still imports
+
+## Quick-add and templates
+
+- [ ] Composer hint shows `#label  !high  @tomorrow` until a token matches
+- [ ] `Fix login #bug !high @tomorrow` → title "Fix login", Bug label, High,
+      tomorrow's date; chips preview it before submitting
+- [ ] Multi-word labels match without spaces (`#nicetohave`)
+- [ ] Unknown `#tag` and invalid `@2026-02-30` stay in the title
+- [ ] `!1`–`!4` and `!low/!med/!high/!urgent` both work
+- [ ] `@fri` means the next Friday (a week out when today is Friday)
+- [ ] Only tokens (e.g. `#bug !low`) → Add is disabled
+- [ ] Due dates show the correct day in a timezone west of UTC
+- [ ] New board modal lists 5 templates with column chips and WIP limits;
+      arrow keys move between them
+- [ ] Each template creates the right columns, WIP limits and labels;
+      Classic matches the old defaults
+
 ## Homepage
 
 - [ ] Hero, principles, features, keyboard, planners, how-it-works and closing

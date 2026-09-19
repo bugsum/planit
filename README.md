@@ -28,11 +28,15 @@ planner; Mindmap and Roadmap are next.
 
 - Multiple boards, each with its own columns, cards and labels
 - Columns you define: rename, reorder, delete, optional WIP limits
-- Cards with description, colored labels, priority and due dates
+- Board templates: Classic, Sprint, Bug triage, Product launch, Personal project
+- Cards with markdown notes, checklists, colored labels, priority and due dates
+- Quick-add syntax: `Fix login #bug !high @tomorrow`
 - Drag and drop for cards and columns
 - Keyboard-first: select, move, duplicate, delete and re-prioritise cards without the mouse
 - Right-click context menus on cards, columns, boards and empty space
+- Command palette (<kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>K</kbd>) to jump to any board, card or action
 - Undo and redo for every board edit
+- Open tabs stay in sync
 - Search and filter by text, label or priority
 - Export a board to JSON and import it back
 
