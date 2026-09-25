@@ -1,4 +1,4 @@
-export type ShortcutGroup = "General" | "Board" | "Navigate" | "Cards" | "Boards list";
+export type ShortcutGroup = "General" | "Board" | "Navigate" | "Cards" | "Boards list" | "Mindmap";
 
 type Shortcut = {
   keys: string[];
@@ -49,6 +49,30 @@ export const SHORTCUTS = {
   },
 
   newBoard: { keys: ["n"], label: "New board", group: "Boards list" },
+  newMap: { keys: ["n"], label: "New mindmap", group: "Mindmap" },
+
+  walkTree: {
+    keys: ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"],
+    display: ["↑ ↓ ← →"],
+    label: "Move between nodes",
+    group: "Mindmap",
+  },
+  addChild: { keys: ["Tab"], label: "Add a child node", group: "Mindmap" },
+  addSibling: { keys: ["Enter"], label: "Add a sibling node", group: "Mindmap" },
+  renameNode: { keys: ["F2"], label: "Rename the selected node", group: "Mindmap" },
+  nodeNotes: { keys: ["mod+e"], label: "Open notes for the node", group: "Mindmap" },
+  collapseNode: { keys: ["Space"], label: "Collapse or expand a branch", group: "Mindmap" },
+  deleteNode: {
+    keys: ["Delete", "Backspace"],
+    label: "Delete the node and its branch",
+    group: "Mindmap",
+  },
+  nodeUp: { keys: ["shift+ArrowUp"], label: "Move node up among siblings", group: "Mindmap" },
+  nodeDown: { keys: ["shift+ArrowDown"], label: "Move node down among siblings", group: "Mindmap" },
+  sendToBoard: { keys: ["mod+b"], label: "Send the branch to a Kanban board", group: "Mindmap" },
+  fitMap: { keys: ["0"], label: "Fit the map on screen", group: "Mindmap" },
+  zoomIn: { keys: ["="], label: "Zoom in", group: "Mindmap" },
+  zoomOut: { keys: ["-"], label: "Zoom out", group: "Mindmap" },
   importBoard: { keys: ["mod+o"], label: "Import board from JSON", group: "Boards list" },
 } satisfies Record<string, Shortcut>;
 
@@ -57,6 +81,7 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
   "Board",
   "Navigate",
   "Cards",
+  "Mindmap",
   "Boards list",
 ];
 
@@ -70,6 +95,11 @@ export function isMac() {
   if (typeof navigator === "undefined") return false;
   const data = (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData;
   return /mac|iphone|ipad/i.test(data?.platform || navigator.userAgent);
+}
+
+/** The browser reports the space bar as " "; the registry spells it "Space". */
+function normalizeKey(key: string) {
+  return key === " " ? "space" : key.toLowerCase();
 }
 
 function parseCombo(combo: string) {
@@ -93,7 +123,7 @@ export function matchesCombo(event: KeyboardEvent, combo: string, mac: boolean) 
   const symbol = key.length === 1 && !/[a-z0-9]/i.test(key);
   if (!symbol && event.shiftKey !== shift) return false;
 
-  return event.key.toLowerCase() === key.toLowerCase();
+  return normalizeKey(event.key) === normalizeKey(key);
 }
 
 const KEY_NAMES: Record<string, string> = {
@@ -105,6 +135,10 @@ const KEY_NAMES: Record<string, string> = {
   Backspace: "⌫",
   Delete: "Del",
   ContextMenu: "Menu",
+  Space: "Space",
+  Tab: "Tab",
+  Enter: "Enter",
+  "=": "+",
 };
 
 export function comboParts(combo: string, mac: boolean) {
