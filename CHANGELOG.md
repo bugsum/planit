@@ -4,6 +4,19 @@ All notable changes are documented here. Format based on [Keep a Changelog](http
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-25
+
+### Added
+
+- Mindmap planner at `/mindmap`: maps of nodes on an auto-arranged canvas, with pan, zoom and fit
+- Keyboard-first editing: Tab for a child, Enter for a sibling, arrows to walk the tree, Space to
+  collapse, F2 to rename, Shift + arrows to reorder
+- Node colours and markdown notes, plus context menus on nodes, the canvas and map tiles
+- Drag a node onto another to re-parent its branch
+- Send a branch to a Kanban board as one card with a checklist, or a card per child
+- Export a map as JSON, PNG or SVG, and import maps back
+- Mindmaps in the top bar, the homepage and the command palette; maps stay in sync across tabs
+
 ## [0.2.1] - 2026-09-19
 
 ### Changed
@@ -46,7 +59,8 @@ All notable changes are documented here. Format based on [Keep a Changelog](http
 - JSON export/import with local browser storage
 - Branding and homepage
 
-[Unreleased]: https://github.com/bugsum/planit/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/bugsum/planit/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/bugsum/planit/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/bugsum/planit/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/bugsum/planit/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/bugsum/planit/releases/tag/v0.1.0
