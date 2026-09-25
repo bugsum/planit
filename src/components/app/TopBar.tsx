@@ -11,7 +11,10 @@ import { SITE } from "@/helpers/site";
 import { SHORTCUTS } from "@/helpers/shortcuts";
 import { openPalette, openShortcuts } from "@/store/ui";
 
-const NAV = [{ href: "/kanban", label: "Kanban" }];
+const NAV = [
+  { href: "/kanban", label: "Kanban" },
+  { href: "/mindmap", label: "Mindmap" },
+];
 
 export function TopBar() {
   const pathname = usePathname();
@@ -40,12 +43,6 @@ export function TopBar() {
                 </Link>
               );
             })}
-            <span className="hidden cursor-default items-center gap-1.5 px-3 py-1.5 text-[13px] font-semibold text-zinc-600 sm:inline-flex">
-              Mindmap
-              <span className="rounded bg-white/5 px-1 py-px text-[9px] tracking-wider uppercase">
-                Soon
-              </span>
-            </span>
           </nav>
         </div>
 

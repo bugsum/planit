@@ -32,7 +32,7 @@ export function Hero() {
             <span className="rounded-full bg-accent px-2 py-0.5 text-[11px] font-bold text-white">
               New
             </span>
-            Keyboard-first Kanban is live
+            Mindmaps are here, and they talk to your boards
             <ArrowRightIcon width={13} height={13} />
           </Link>
 

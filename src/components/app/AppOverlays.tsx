@@ -7,6 +7,7 @@ import { ContextMenuHost } from "@/components/ui/ContextMenu";
 import { SHORTCUTS } from "@/helpers/shortcuts";
 import { useHotkeys } from "@/helpers/use-hotkeys";
 import { useBoardsSync } from "@/store/boards";
+import { useMindmapsSync } from "@/store/mindmaps";
 import { openPalette, openShortcuts } from "@/store/ui";
 
 /** App-wide layers and listeners: palette, context menu, shortcut guide, cross-tab sync, save errors. */
@@ -16,6 +17,7 @@ export function AppOverlays() {
     { keys: SHORTCUTS.help.keys, handler: openShortcuts },
   ]);
   useBoardsSync();
+  useMindmapsSync();
 
   return (
     <>

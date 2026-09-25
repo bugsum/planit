@@ -11,6 +11,7 @@ import { SHORTCUTS, formatCombo } from "@/helpers/shortcuts";
 import { useIsMac } from "@/helpers/use-hotkeys";
 import { useHydrated } from "@/helpers/use-hydrated";
 import { useBoardList, useBoardsStore } from "@/store/boards";
+import { useMindmapList, useMindmapsStore } from "@/store/mindmaps";
 import { openShortcuts, useUiStore } from "@/store/ui";
 import type { Command } from "@/types/ui";
 
@@ -48,7 +49,9 @@ function PaletteBody({ onDone }: { onDone: () => void }) {
   const router = useRouter();
   const mac = useIsMac();
   useHydrated(useBoardsStore);
+  useHydrated(useMindmapsStore);
   const boards = useBoardList();
+  const maps = useMindmapList();
   const listRef = useRef<HTMLDivElement>(null);
 
   const [query, setQuery] = useState("");
@@ -72,6 +75,23 @@ function PaletteBody({ onDone }: { onDone: () => void }) {
         group: "Navigation",
         keywords: "kanban list",
         run: go("/kanban"),
+      },
+      {
+        id: "nav:maps",
+        title: "Go to mindmaps",
+        group: "Navigation",
+        keywords: "mindmap maps ideas",
+        run: go("/mindmap"),
+      },
+      {
+        id: "map:new",
+        title: "New mindmap",
+        group: "General",
+        keywords: "create mindmap idea",
+        run: () => {
+          useUiStore.setState({ pendingNewMap: true });
+          router.push("/mindmap");
+        },
       },
       {
         id: "board:new",
@@ -116,6 +136,21 @@ function PaletteBody({ onDone }: { onDone: () => void }) {
     [boards, router],
   );
 
+  const mapCommands = useMemo(
+    () =>
+      [...maps]
+        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+        .map<Command>((map) => ({
+          id: `map:${map.id}`,
+          title: map.name,
+          subtitle: `${Object.keys(map.nodes).length} nodes`,
+          group: "Mindmaps",
+          keywords: "open mindmap map",
+          run: () => router.push(`/mindmap/${map.id}`),
+        })),
+    [maps, router],
+  );
+
   const cardCommands = useMemo(
     () =>
       boards.flatMap((board) =>
@@ -149,8 +184,14 @@ function PaletteBody({ onDone }: { onDone: () => void }) {
 
   const trimmed = query.trim();
   const results = useMemo(() => {
-    if (!trimmed) return [...baseCommands, ...boardCommands.slice(0, RECENT_BOARDS)];
-    return [...baseCommands, ...boardCommands, ...cardCommands]
+    if (!trimmed) {
+      return [
+        ...baseCommands,
+        ...boardCommands.slice(0, RECENT_BOARDS),
+        ...mapCommands.slice(0, RECENT_BOARDS),
+      ];
+    }
+    return [...baseCommands, ...boardCommands, ...mapCommands, ...cardCommands]
       .map((command) => ({
         command,
         score: Math.max(
@@ -162,7 +203,7 @@ function PaletteBody({ onDone }: { onDone: () => void }) {
       .sort((a, b) => b.score - a.score)
       .slice(0, MAX_RESULTS)
       .map((entry) => entry.command);
-  }, [trimmed, baseCommands, boardCommands, cardCommands]);
+  }, [trimmed, baseCommands, boardCommands, mapCommands, cardCommands]);
 
   const current = Math.min(active, Math.max(results.length - 1, 0));
 
@@ -223,7 +264,11 @@ function PaletteBody({ onDone }: { onDone: () => void }) {
               <div key={command.id}>
                 {header ? (
                   <p className="px-3 pt-3 pb-1 text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
-                    {command.group === "Boards" ? "Recent boards" : command.group}
+                    {command.group === "Boards"
+                      ? "Recent boards"
+                      : command.group === "Mindmaps"
+                        ? "Recent maps"
+                        : command.group}
                   </p>
                 ) : null}
                 <button

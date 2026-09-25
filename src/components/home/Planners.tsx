@@ -28,10 +28,15 @@ const PLANNERS: Planner[] = [
   },
   {
     name: "Mindmap",
-    status: "Next up",
+    status: "Live",
     icon: MindmapIcon,
-    body: "Branch out an idea before it becomes a task, then send branches to a board.",
-    points: ["Free-form canvas", "Collapse and focus branches", "Promote nodes to cards"],
+    body: "Branch out an idea before it becomes a task, then send a branch to a board.",
+    points: [
+      "Tab and Enter to grow the map",
+      "Collapse branches, colour them, add notes",
+      "Send a branch to Kanban as cards",
+    ],
+    href: "/mindmap",
   },
   {
     name: "Roadmap",

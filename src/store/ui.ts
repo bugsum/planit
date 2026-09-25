@@ -16,6 +16,7 @@ type UiState = {
   cardOpener: CardOpener | null;
   /** Set by the palette's "New board" when it has to navigate to the boards list first. */
   pendingNewBoard: boolean;
+  pendingNewMap: boolean;
   openMenu: (menu: MenuRequest) => void;
   closeMenu: () => void;
   setShortcutsOpen: (open: boolean) => void;
@@ -31,6 +32,7 @@ export const useUiStore = create<UiState>()((set) => ({
   commandProvider: null,
   cardOpener: null,
   pendingNewBoard: false,
+  pendingNewMap: false,
   openMenu: (menu) => set({ menu: { ...menu, id: ++menuCount } }),
   closeMenu: () => set({ menu: null }),
   setShortcutsOpen: (shortcutsOpen) => set({ shortcutsOpen, menu: null }),
