@@ -96,6 +96,65 @@ Run these against the deployed site (https://planit.iamsamarth.xyz).
 - [ ] Each template creates the right columns, WIP limits and labels;
       Classic matches the old defaults
 
+## Mindmaps
+
+### Maps list (`/mindmap`)
+
+- [ ] Empty state shows "Start with one idea." with Create and Import
+- [ ] `N` opens the New map modal; the name becomes the central node
+- [ ] `Ctrl/⌘ + O` opens the file picker for import
+- [ ] Tiles show the first branches as chips, node count and last edit
+- [ ] Right-click a tile: Open, Open in new tab, Rename, Duplicate, Export JSON/PNG, Delete
+- [ ] Right-click empty space: New mindmap, Import, Keyboard shortcuts
+
+### Canvas
+
+- [ ] A new map opens centred and fitted
+- [ ] Drag empty canvas to pan; wheel zooms towards the cursor; the page never scrolls
+- [ ] Zoom buttons, percentage readout and Fit work; `0`, `=` and `-` do the same
+- [ ] Clicking a node selects it; clicking empty canvas clears the selection
+- [ ] Double-click a node edits it in place; Enter commits, Escape reverts
+- [ ] Nodes never overlap, even with long text (text wraps, box grows to a limit)
+- [ ] Branches alternate left and right of the root as you add them
+
+### Keyboard
+
+- [ ] `Tab` adds a child and starts editing it
+- [ ] `Enter` adds a sibling (on the root it adds a child, since the root has none)
+- [ ] Arrow keys walk the tree; on a left-hand branch, `←` goes deeper and `→` back
+- [ ] `↑`/`↓` move between siblings
+- [ ] `Shift + ↑/↓` reorders a node among its siblings
+- [ ] `F2` renames, `Ctrl/⌘ + E` opens notes
+- [ ] `Space` collapses/expands; collapsed branches show `+` and hide their children
+- [ ] `Delete` removes the node and everything under it; the root can't be deleted
+- [ ] `Ctrl/⌘ + Z` undoes a delete, a rename (as one step), a move and a collapse
+- [ ] No shortcut fires while editing a node or while a dialog is open
+
+### Nodes
+
+- [ ] Drag a node onto another to re-parent it; the target highlights
+- [ ] Dropping a node onto its own descendant is refused (nothing moves)
+- [ ] Dragging the root is not possible
+- [ ] Node dialog: text, colour swatches, markdown notes with preview/edit
+- [ ] A node with notes shows the small dot; `<script>` in notes renders as text
+- [ ] Right-click a node: add child/sibling, rename, notes, collapse, move, colour, send, delete
+
+### Send to a board
+
+- [ ] With no boards, the dialog says so instead of offering an empty picker
+- [ ] Board and column pickers list the real boards; changing board resets the column
+- [ ] "One card, children as checklist" creates one card whose checklist is the children
+- [ ] "A card per child" creates one card per child, each with its own children as checklist
+- [ ] Node notes land in the card description, and you end up on that board
+- [ ] The map is unchanged afterwards
+
+### Export and import
+
+- [ ] Export JSON, then import it: same map, new ids, original untouched
+- [ ] Export PNG and SVG: the image matches the canvas, including colours and collapsed state
+- [ ] Import a malformed map file: inline error, nothing breaks
+- [ ] Open the same map in two tabs: edits in one appear in the other
+
 ## Homepage
 
 - [ ] Hero, principles, features, keyboard, planners, how-it-works and closing

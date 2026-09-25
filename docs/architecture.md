@@ -13,6 +13,7 @@ src/
   components/app/      app shell (TopBar, ShortcutsDialog, AppOverlays)
   components/home/     homepage sections (static server components)
   components/kanban/   the Kanban feature, including its menus and keybindings
+  components/mindmap/  the Mindmap feature, including its canvas and keybindings
   store/               zustand stores: one per planner, plus ui.ts for app chrome
   helpers/             pure utilities, hooks, the shortcut registry, the storage adapter
   types/               shared types
@@ -205,6 +206,29 @@ previews the result and passes it to `addCard(..., extras)`.
 - `.github/workflows`: CI (quality), PR checks, release on merge, stale bot.
   Branch protection lives in `.github/rulesets/master.json` and is applied by
   hand; see [repository-settings.md](repository-settings.md).
+
+## Mindmaps (`src/store/mindmaps.ts`, `src/helpers/mindmap*.ts`)
+
+A `Mindmap` is a tree: nodes hold `parentId` plus an ordered `childIds`, and the
+store mirrors `boards.ts` exactly — same `edit()` helper, undo history, cross-tab
+sync and persistence (`planit.mindmap.v1`).
+
+Positions are never stored. `helpers/mindmap-layout.ts` is a pure function that
+turns the tree into boxes and edge paths: the root sits in the middle and its
+branches alternate left and right, each laid out as a tidy tree that grows
+outwards. `MapView` only renders what the layout returns, and the SVG/PNG export
+in `helpers/mindmap-transfer.ts` reuses the same function, so a picture always
+matches the canvas.
+
+`MapView` owns pan/zoom (a single transform), selection and inline editing;
+`useMapKeys` maps the keyboard onto the tree, with Left/Right meaning "towards
+the leaves" or "towards the root" depending on which side a node sits on.
+Re-parenting uses the same pragmatic-drag-and-drop adapter as the board, and the
+store refuses a move that would put a node inside its own branch.
+
+`SendToBoardDialog` is the bridge to Kanban: a branch becomes either one card
+whose checklist is its children, or a card per child. It only calls existing
+board actions, so nothing in the Kanban store knows about mindmaps.
 
 ## Import / export (`src/helpers/transfer.ts`)
 

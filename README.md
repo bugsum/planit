@@ -24,6 +24,14 @@ planner; Mindmap and Roadmap are next.
 
 ## Features
 
+**Mindmap**
+
+- Branch out an idea on an auto-arranged canvas: Tab adds a child, Enter a sibling
+- Collapse branches, colour nodes, add markdown notes
+- Drag a node onto another to re-parent it; pan and zoom the canvas
+- Send a branch to a Kanban board as one card with a checklist, or a card per child
+- Export a map as JSON, PNG or SVG
+
 **Kanban**
 
 - Multiple boards, each with its own columns, cards and labels
@@ -92,7 +100,7 @@ boards to a backend later does not touch the UI. See
 ## Roadmap
 
 - [x] Kanban boards
-- [ ] Mindmaps
+- [x] Mindmaps
 - [ ] Roadmap / timeline view
 - [ ] Sync across devices
 
